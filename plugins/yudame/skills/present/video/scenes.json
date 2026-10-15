@@ -1,0 +1,14 @@
+[
+  {
+    "id": "problem",
+    "title": "Every deploy waits on one person.",
+    "points": ["Releases queue behind a single reviewer", "Average wait: two days"],
+    "text": "Right now, every deploy waits on one person. Releases queue up behind a single reviewer, and the average wait is two days."
+  },
+  {
+    "id": "fix",
+    "title": "Automated checks clear the routine cases.",
+    "points": ["Routine changes merge on green", "The reviewer sees only the risky ones"],
+    "text": "The fix is simple. Routine changes merge as soon as the checks go green, so the reviewer only sees the risky ones."
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "yudame",
+  "description": "Yudame's Claude Code skills: everyday work for anyone, and an engineering pipeline for developers",
+  "owner": {
+    "name": "Yudame"
+  },
+  "plugins": [
+    {
+      "name": "yudame",
+      "description": "Skills for everyone: presenting, email and editing. No git or GitHub needed.",
+      "source": "./plugins/yudame"
+    },
+    {
+      "name": "yudame-dev",
+      "description": "Skills for developers: the issue-to-merge pipeline, audits, and building agents and skills. Assumes git and GitHub.",
+      "source": "./plugins/yudame-dev"
+    }
+  ]
+}

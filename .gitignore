@@ -1,0 +1,4 @@
+plugins/yudame-dev/skills/audit-skills/references/anthropic-*
+plugins/yudame-dev/skills/audit-skills/references/metadata.json
+node_modules/
+.DS_Store

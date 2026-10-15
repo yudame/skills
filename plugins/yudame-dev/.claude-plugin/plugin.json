@@ -1,0 +1,7 @@
+{
+  "name": "yudame-dev",
+  "description": "Skills for developers: the issue-to-merge pipeline, audits, and building agents and skills. Assumes git and GitHub.",
+  "author": {
+    "name": "Yudame"
+  }
+}
