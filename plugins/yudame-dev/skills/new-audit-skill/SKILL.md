@@ -1,7 +1,7 @@
 ---
 name: new-audit-skill
 description: "Create a new audit skill that checks part of a codebase and reports or fixes problems. Use for 'new audit' or 'add an audit'."
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
+allowed-tools: Read Write Edit Glob Grep Bash
 argument-hint: "<subject-to-audit>"
 ---
 
@@ -9,7 +9,7 @@ argument-hint: "<subject-to-audit>"
 
 **Goal:** turn "I want to check X for problems" into an audit skill that produces accurate, actionable findings on its first real run. A template that merely looks right is not done; an audit is done when it has been run on real data, caught the problems the user knows about, and raised no false alarms.
 
-Build it with [AUDIT_TEMPLATE.md](AUDIT_TEMPLATE.md). General skill rules (placement, description, frontmatter fields) are in `/yudame-dev:new-skill`. For working examples, read the existing audits in this plugin: `/yudame-dev:audit-skills` (script-backed, deterministic, auto-fixes trivial issues), `/yudame-dev:audit-models` (prompt-only, exploratory, report only), `/yudame-dev:audit-hooks` (rule checklist, report only), `/yudame-dev:do-design-audit` (scored rubric), `/yudame-dev:do-integration-audit` (semantic wiring checks).
+Build it with [AUDIT_TEMPLATE.md](AUDIT_TEMPLATE.md). General skill rules (placement, description, frontmatter fields) are in the new-skill skill. For working examples, read the existing audit skills in this plugin: audit-skills (script-backed, auto-fixes trivial issues), audit-models (prompt-only, report only), audit-hooks (rule checklist), do-design-audit (scored rubric), do-integration-audit (semantic wiring checks).
 
 ## 1. Pin down the audit
 
@@ -18,7 +18,7 @@ Get these from the conversation first and ask only for what is missing:
 - **Subject and scan target:** what is audited and exactly where it lives (`.env*`, `config/*.py`, CI YAML). An audit with an unbounded target never finishes cleanly.
 - **Known problems:** what the user has already seen go wrong. These become the first checks and the test of whether the audit works.
 - **Disposition:** report only, auto-fix the trivial and report the rest, or apply everything. Auto-fix only when the fix is unambiguous and touches nothing outside the audited files, and always show what changed. Even an apply-everything audit leaves the changes for a human or its caller to commit rather than committing its own output unreviewed.
-- **When it runs:** after certain changes, periodically, before a release. This feeds the description and whether to set `disable-model-invocation: true` (set it when a false trigger would waste real time; leave it unset for lightweight audits that are useful to offer unprompted).
+- **When it runs:** after certain changes, periodically, before a release. This feeds the description and whether to set `disable-model-invocation: true` (when a false trigger would waste real time; with it, add `agents/openai.yaml` setting `allow_implicit_invocation: false` so Codex agrees).
 
 ## 2. Design the checks
 

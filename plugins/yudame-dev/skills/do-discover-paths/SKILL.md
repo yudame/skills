@@ -2,7 +2,7 @@
 name: do-discover-paths
 description: "Record happy-path browser traces on a site with BYOB MCP, as JSON for generating tests. Use for 'discover paths' or 'map site flows'."
 argument-hint: "<url> [path-name]"
-allowed-tools: mcp__byob__browser_navigate, mcp__byob__browser_read, mcp__byob__browser_click, mcp__byob__browser_type, mcp__byob__browser_eval, mcp__byob__browser_screenshot, mcp__byob__browser_close_tab, Bash, Read, Write, Edit, Grep, Glob
+allowed-tools: mcp__byob__browser_navigate mcp__byob__browser_read mcp__byob__browser_click mcp__byob__browser_type mcp__byob__browser_eval mcp__byob__browser_screenshot mcp__byob__browser_close_tab Bash Read Write Edit Grep Glob
 ---
 
 # Discover Happy Paths
@@ -21,7 +21,7 @@ Because the browser is the user's own, logged in to real accounts, clicks have r
 
 ## Input
 
-`$ARGUMENTS`: `<target-url> [path-name]`. The path name defaults to the slugified URL path. If arguments are empty, pull both from the user's original message.
+`$ARGUMENTS`: `<target-url> [path-name]`. The path name defaults to the slugified URL path. If empty or literal, use what followed the skill name.
 
 ## CSS selector extraction
 

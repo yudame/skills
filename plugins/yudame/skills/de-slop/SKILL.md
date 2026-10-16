@@ -1,7 +1,7 @@
 ---
 name: de-slop
 description: "Pre-publish editorial gate for external-audience writing: removes AI-writing tells and blocks drafts with nothing to say. Use on a finished draft of a document, deck, email, post or web copy, on 'de-slop this', 'editorial pass', 'humanize this', 'remove the AI tells', or when another skill (email, present) gates its output through it."
-allowed-tools: Read, Write, Edit, Grep, Glob, Bash
+allowed-tools: Read Write Edit Grep Glob Bash
 argument-hint: "[draft-file-path]"
 user-invocable: true
 ---
@@ -17,7 +17,7 @@ Drafting skills don't carry these style rules; they hand finished drafts here, t
 
 ## Read cold
 
-The author of a draft is its worst judge: same model, same context, full commitment to what it meant to say. When another skill gates through this one, run the review in a fresh context (a subagent or forked context) that receives only the draft, the medium and the audience, never the drafting conversation, and judge it as a first-time reader would. When a user invokes `/yudame:de-slop` directly it may run inline, but if this context wrote the draft, spawn the fresh review anyway.
+The author of a draft is its worst judge: same model, same context, full commitment to what it meant to say. When another skill gates through this one, run the review in a fresh context (a subagent or forked context) that receives only the draft, the medium and the audience, never the drafting conversation, and judge it as a first-time reader would. Invoked directly, it may run inline, but if this context wrote the draft, use a fresh one anyway; without subagents, re-read only the draft file.
 
 ## Input and output
 
@@ -25,7 +25,7 @@ The author of a draft is its worst judge: same model, same context, full commitm
 - Pasted text: return the edited draft in the reply.
 - Called by another skill: edit the given path in place and return the verdict and change log so the caller can proceed.
 
-If the repo or user has declared house style (tells to ignore, such as "em dashes are part of my voice", extra tells, spelling conventions), honor it. Look for it in the project's CLAUDE.md or a style note the caller passes in.
+If the repo or user has declared house style (tells to ignore, such as "em dashes are part of my voice", extra tells, spelling conventions), honor it. Look for it in the project's AGENTS.md or CLAUDE.md, or a style note the caller passes in.
 
 ## Reference files
 
@@ -103,6 +103,6 @@ DE-SLOP: BLOCK
   the decision you're asking the client to make"]
 ```
 
-What the caller does with it: on PASS, proceed to send, export or publish. On BLOCK, return the draft to the drafter with the diagnosis as revision instructions and rerun this pass, in a fresh context again, on the revision. After two BLOCKs, stop and show the human the draft and both diagnoses rather than shipping or looping; a draft that can't find one concrete specific in three tries has a sourcing problem, not a writing problem.
+What the caller does with it: on PASS, proceed to send, export or publish. On BLOCK, return the draft to the drafter with the diagnosis as revision instructions and rerun this pass, in a fresh context again, on the revision. After two BLOCKs, stop and show the human the draft and both diagnoses; a draft with no concrete specific after three tries has a sourcing problem.
 
 For social posts, a stricter substance check (a metric, a constraint, an opinion) is worth running after this pass if one is available; for everything else this pass is the pre-publish gate.

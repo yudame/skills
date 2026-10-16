@@ -2,7 +2,7 @@
 name: do-pr-review
 description: "Review a PR against its plan and issue and post a verified verdict to GitHub. Use for 'review this PR' or a PR URL."
 argument-hint: "<pr-number>"
-allowed-tools: mcp__byob__*, Bash(gh:*), Bash(git:*), Bash(python:*), Bash(jq:*), Read, Write, Edit, Grep, Glob, Agent
+allowed-tools: mcp__byob__* Bash(gh:*) Bash(git:*) Bash(python:*) Bash(jq:*) Read Write Edit Grep Glob Agent
 ---
 
 # PR Review
@@ -29,13 +29,11 @@ browser MCP for screenshots.
 
 ## Where this runs
 
-Run inline in whatever context invoked you, not as a forked skill. Subagents
-can only nest so deep: a supervisor that already runs each stage in its own
-subagent, plus a fork, leaves the review unable to spawn judges, and the
-roster silently collapses into one reviewer. Isolation is the dispatcher's job:
-because the review checks out the PR branch, a caller that needs its own
-working tree preserved spawns this skill as an Agent with
-`isolation: "worktree"` and `run_in_background: false`.
+Run inline in whatever context invoked you, not as a forked skill: subagents
+nest only so deep, and a fork inside a pipeline stage leaves no room to spawn
+judges. Because the review checks out the PR branch, a caller that needs its
+own working tree preserved runs this skill in a separate worktree (Claude Code
+note: `isolation: "worktree"`, `run_in_background: false`).
 
 ## 1. Resolve context and preflight
 
@@ -88,13 +86,11 @@ verdict is derived.
 
 ### Multi-judge (only if the addendum declares a roster)
 
-Dispatch one general-purpose Agent per declared judge, each with its lens and
-the same PR context. Pass `run_in_background: false` on every dispatch and wait
-for every judge in this turn before aggregating: a parent that returns while
-judges are in flight kills them, and nothing gets posted. Don't pass `name` on
-these dispatches; a named spawn from inside a subagent is refused with a
-misleading "Teammates cannot spawn other teammates" error where the unnamed one
-succeeds.
+Dispatch one general-purpose subagent per declared judge, each with its lens
+and the same PR context, and wait for every judge in this turn before
+aggregating: a parent that returns while judges are in flight kills them.
+Claude Code notes: `run_in_background: false` on every dispatch; no `name`,
+since a named spawn from inside a subagent is refused.
 
 Judges return their findings; they don't post or record anything. You post
 per-judge comments under a heading distinct from the aggregate, then the
@@ -103,10 +99,10 @@ A failed optional judge counts as a skip unless the addendum marks it
 fail-closed.
 
 The value of a roster is independent agreement, so record which mode actually
-ran as `REVIEW_MODE`: `independent roster (M judges)`, or, if the Agent tool is
-missing or every dispatch hits the spawn-depth error, apply each lens yourself
-and record `sequential lenses (Agent tool unavailable: <exact error or "not in
-tool list">)`. State the mode in the posted review, the summary, and the OUTCOME
+ran as `REVIEW_MODE`: `independent roster (M judges)`, or, if the harness has
+no subagents or every dispatch hits the spawn-depth error, apply each lens
+yourself, re-reading only the diff and plan for each, and record `sequential
+lenses (no subagents: <exact error or "harness has none">)`. State the mode in the posted review, the summary, and the OUTCOME
 `notes`. A sequential run is a shortfall: list only the judges that ran, keep
 the declared roster size as expected, and never present it as consensus.
 
@@ -149,14 +145,14 @@ confirming the review actually landed.
 
 Approve only with zero findings. Any blocker, tech debt, or nit means
 `--request-changes`, because approval tells the merge gate there is no work
-left, and `/yudame-dev:do-patch` fixes tech debt and nits too. Only a purely subjective
+left, and the do-patch skill fixes tech debt and nits too. Only a purely subjective
 nit may be waived, and that needs a human's say-so. Never drop a finding to make
 a review look clean, and never soften a blocker into tech debt to speed a
 merge.
 
 ## 5. Record the verdict (only if the addendum declares a substrate)
 
-Without a substrate, the posted GitHub review is the verdict; `/yudame-dev:do-sdlc`
+Without a substrate, the posted GitHub review is the verdict; the do-sdlc skill
 skips its own check in that case.
 
 With one, every exit path (approved, changes requested, conflict, closed) goes
@@ -180,13 +176,13 @@ Summarize as bullets: branch to base, plan path or "none", result, review mode
 (if a roster was declared), review URL, counts of blockers / tech debt / nits,
 and screenshots captured with their directory.
 
-End with one OUTCOME line, which `/yudame-dev:do-sdlc` parses. It is the last line, not
+End with one OUTCOME line, which the do-sdlc skill parses. It is the last line, not
 the last action: posting and any verdict record come first.
 
 ```
-<!-- OUTCOME {"status":"success","stage":"REVIEW","verdict":"APPROVED","artifacts":{"review_url":"<url>","blockers":0,"tech_debt":0,"nits":0},"notes":"Approved with no findings.","next_skill":"/yudame-dev:do-docs"} -->
-<!-- OUTCOME {"status":"partial","stage":"REVIEW","verdict":"CHANGES_REQUESTED","artifacts":{"review_url":"<url>","blockers":0,"tech_debt":2,"nits":1},"notes":"2 tech_debt, 1 nit. Routing to /yudame-dev:do-patch.","next_skill":"/yudame-dev:do-patch"} -->
-<!-- OUTCOME {"status":"fail","stage":"REVIEW","verdict":"CHANGES_REQUESTED","artifacts":{"review_url":"<url>","blockers":2,"tech_debt":1,"nits":0},"notes":"2 blockers.","failure_reason":"2 blockers must be fixed before merge","next_skill":"/yudame-dev:do-patch"} -->
+<!-- OUTCOME {"status":"success","stage":"REVIEW","verdict":"APPROVED","artifacts":{"review_url":"<url>","blockers":0,"tech_debt":0,"nits":0},"notes":"Approved with no findings.","next_skill":"do-docs"} -->
+<!-- OUTCOME {"status":"partial","stage":"REVIEW","verdict":"CHANGES_REQUESTED","artifacts":{"review_url":"<url>","blockers":0,"tech_debt":2,"nits":1},"notes":"2 tech_debt, 1 nit. Routing to do-patch.","next_skill":"do-patch"} -->
+<!-- OUTCOME {"status":"fail","stage":"REVIEW","verdict":"CHANGES_REQUESTED","artifacts":{"review_url":"<url>","blockers":2,"tech_debt":1,"nits":0},"notes":"2 blockers.","failure_reason":"2 blockers must be fixed before merge","next_skill":"do-patch"} -->
 <!-- OUTCOME {"status":"fail","stage":"REVIEW","verdict":"BLOCKED_ON_CONFLICT","artifacts":{"review_url":"<comment_url>","mergeStateStatus":"DIRTY","mergeable":"CONFLICTING"},"notes":"Merge conflicts; rebase required before review.","failure_reason":"mergeStateStatus=DIRTY","next_skill":null} -->
 <!-- OUTCOME {"status":"fail","stage":"REVIEW","verdict":"PR_CLOSED","artifacts":{"review_url":"<comment_url>","state":"CLOSED"},"notes":"PR is not open; review skipped.","failure_reason":"state=CLOSED","next_skill":null} -->
 ```

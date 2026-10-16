@@ -2,7 +2,7 @@ import {AbsoluteFill, Audio, Sequence, Series, interpolate, spring, staticFile, 
 import {loadFont as loadLora} from '@remotion/google-fonts/Lora';
 import {loadFont as loadInter} from '@remotion/google-fonts/Inter';
 
-// House style fallback (/yudame:house-style). Replace these when the project has its own style.
+// House style fallback (the house-style skill). Replace these when the project has its own style.
 const INK = '#1A1A1A';
 const CREAM = '#FAF9F6';
 const RED = '#C8102E';

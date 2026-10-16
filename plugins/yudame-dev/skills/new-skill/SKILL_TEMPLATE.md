@@ -1,7 +1,7 @@
 ---
 name: skill-name
 description: What the skill does, in one clause. Use when [trigger condition], or on '[phrase a user would type]', '[synonym]'.
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read Grep Glob Bash
 ---
 
 # Skill Name

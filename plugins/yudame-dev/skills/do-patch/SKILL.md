@@ -13,9 +13,8 @@ directory (run `pwd` once and note it). If the right fix needs an
 architectural change, stop and report that rather than attempting it.
 
 The argument describes what to fix: test output, a review comment, or a short
-summary. If it's empty or the literal `$ARGUMENTS`, take whatever followed
-`/yudame-dev:do-patch` in the user's message, or the most recent test failure or review
-in the conversation. If there's nothing to go on, ask what's failing.
+summary. If `$ARGUMENTS` is empty or literal, use what followed the skill
+name in the message, or the latest test failure or review here. If there's nothing to go on, ask what's failing.
 
 ## Repo-specific rules
 
@@ -67,8 +66,8 @@ inline comment at that spot, such as
 decision rather than a miss. If a fix would violate a plan no-go or
 architectural decision, report the conflict instead of making it.
 
-You can make the fix yourself or hand it to one subagent; for anything beyond a
-few lines, a subagent with clean context often does better. If you delegate,
+You can make the fix yourself or, where the harness has subagents, hand it to
+one; for anything beyond a few lines, clean context often does better. If you delegate,
 give it everything above (plan, issue, branch history, full failure text, full
 review comments, the CWD), and tell it to make minimal edits, not to commit,
 and to report what it changed. One fixer, not a team.
@@ -83,7 +82,7 @@ will.
 
 Run the repo's test suite and lint yourself (the addendum names the commands;
 otherwise the standard runner, plus `ruff check` / `ruff format --check` for
-Python when available). Don't route through `/yudame-dev:do-test`; it's heavier than a
+Python when available). Don't route through the do-test skill; it's heavier than a
 patch needs. Exit 0 with lint clean is a pass, and "no tests collected" (pytest
 exit 5) counts as a pass. Execution errors (pytest exit 2) are failures.
 

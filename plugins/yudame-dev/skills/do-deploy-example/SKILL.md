@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 # Deploy to Production (Template)
 
-This is a template. Copy this skill's directory into the target repo as `.claude/skills/do-deploy/` and customize it; the last section says how.
+This is a template. Copy it into the target repo and customize it; the last section says how.
 
 You are the production deployment operator: confirm the change is merged, run the repo's production deploy, verify production is healthy, and report with evidence. You don't write code, run tests, or open PRs, and you don't fix anything mid-deploy; if something breaks, report it. Deployment is separate from the development pipeline, which ends at merge (and usually covers dev or staging); this is the deliberate promotion of merged work to production.
 
@@ -20,7 +20,7 @@ If either is missing, stop and say the skill hasn't been customized for this rep
 
 ## Resolve what to deploy
 
-The argument is a PR number (`123` or `#123`), a branch (find its merged PR), or empty (the most recently merged PR). If it arrives empty or as the literal `$ARGUMENTS`, take it from the user's message. `gh` targets the current repo, or `GH_REPO` if set.
+The argument is a PR number (`123` or `#123`), a branch (find its merged PR), or empty (the most recently merged PR). If `$ARGUMENTS` is empty or literal, use what followed the skill name. `gh` targets the current repo, or `GH_REPO` if set.
 
 ```bash
 gh pr view <n> --json number,title,state,mergedAt,mergeCommit,baseRefName
@@ -84,7 +84,7 @@ First decide, with the team if there is one, what "deploy" means for this repo:
 7. Are there freezes or gates (incident check, approval, time-of-day)?
 
 Then:
-1. Copy this directory to the repo's `.claude/skills/do-deploy/`.
-2. In `SKILL.md`: set `name: do-deploy`, write a repo-specific `description`, remove `disable-model-invocation: true` if the model may trigger it, drop "(Template)" from the title, and delete this section.
+1. Copy this directory to the repo's `.agents/skills/do-deploy/` (Codex, Pi) or `.claude/skills/do-deploy/`.
+2. In `SKILL.md`: set `name: do-deploy`, write a repo-specific `description`, if the model may trigger it, remove `disable-model-invocation: true` and `agents/openai.yaml`, drop "(Template)" from the title, and delete this section.
 3. Write `DEPLOYMENT_PROCESS.md` and `HEALTH_CHECKS.md` from the answers above.
-4. Test it with `/do-deploy` after the next merge.
+4. Test it after the next merge.

@@ -10,15 +10,15 @@ Critique a plan document before it is built: run structural checks, then dispatc
 
 The value of the war room is independent convergence. Two critics reaching the same blocker without seeing each other's reasoning is stronger evidence than one pass listing it twice. A good critique finds the few things that would actually cause rework, each specific enough that the reviser can fix it without re-investigating, and says plainly when the plan is ready.
 
-This skill does not rewrite the plan, expand scope, or argue for a different architecture. Its output is findings and a verdict; `/yudame-dev:do-plan` does the revision.
+This skill does not rewrite the plan, expand scope, or argue for a different architecture. Its output is findings and a verdict; the do-plan skill does the revision.
 
 ## Run inline
 
-This skill runs in the context that invokes it, not as a forked skill. The harness withholds the Agent tool from subagents at its spawn-depth limit (three layers below the main conversation by default). A pipeline that already runs each stage in its own subagent put a forked critique exactly at that limit, so it could spawn no critics and quietly collapsed into one agent applying every lens in sequence while the report still looked like a war room. Inline, the critics are one layer shallower.
+This skill runs in the context that invokes it, not as a forked skill. Claude Code note: subagents at the spawn-depth limit (three layers down by default) cannot spawn, and a forked critique inside a pipeline stage sat exactly there, so it collapsed into one agent applying every lens while the report still looked like a war room.
 
 ## 1. Resolve the plan
 
-The argument is an issue number or a plan path. Resolve both the absolute plan path and the issue number. Assign `ISSUE_NUMBER` fresh on every run, never with a `${ISSUE_NUMBER:-…}` default: a stale value inherited from an earlier context once sent a verdict to the wrong issue. These commands avoid `grep -P`, which macOS grep lacks:
+The argument is an issue number or a plan path; if `$ARGUMENTS` is empty or literal, use what followed the skill name in the message. Resolve both the absolute plan path and the issue number. Assign `ISSUE_NUMBER` fresh on every run, never with a `${ISSUE_NUMBER:-…}` default: a stale value inherited from an earlier context once sent a verdict to the wrong issue. These commands avoid `grep -P`, which macOS grep lacks:
 
 ```bash
 ARG="$ARGUMENTS"; ISSUE_NUMBER=""; PLAN_PATH=""
@@ -61,7 +61,7 @@ Choose LITE (one Consolidated Critic) or FULL (Risk & Robustness, Scope & Value,
 
 FULL is forced, with no model call, when the plan has `appetite: Large` or touches high-risk paths: the repo's skills, hooks, agent or persona config, and core pipeline or routing code (or whatever paths the repo declares as doctrine). Nothing downgrades a forced FULL.
 
-Otherwise spawn one foreground `sonnet` agent with:
+Otherwise spawn one foreground `sonnet` agent (without subagents, apply this prompt's rule yourself) with:
 
 ```
 You are a plan triage agent. Classify this plan as LITE or FULL critique depth.
@@ -80,11 +80,9 @@ Write the roster names down before dispatching. Completion is checked against th
 
 Read `CRITICS.md` for the prompt template and each critic's lens. Each critic gets the full plan, the SOURCE_FILES block, the issue and prior-art context, and its lens.
 
-- Issue every critic call in one message so they run concurrently, each a general-purpose agent with `model: "sonnet"`.
-- Pass `run_in_background: false` explicitly on each. A backgrounded subagent dies with the turn that spawned it.
-- Do not pass `name`: a named spawn from inside a subagent is refused where an unnamed one succeeds.
+- Dispatch every critic at once so they run concurrently, each a general-purpose subagent. Claude Code notes: `model: "sonnet"`; `run_in_background: false` on each, since a backgrounded subagent dies with its turn; no `name`, since a named spawn from inside a subagent is refused.
 
-Record the mode for the report. If the critics were dispatched, the mode is `independent roster ({M} critics)`. If the Agent tool is not available here, or every dispatch is refused with the spawn-depth error, apply each lens yourself in sequence, writing each lens's findings under its roster name, and set the mode to `sequential lenses (Agent tool unavailable: {exact error, or "not in tool list"})`. A sequential run still produces verified findings; what it cannot produce is corroboration, and the report must make that visible.
+Record the mode for the report. If the critics were dispatched, the mode is `independent roster ({M} critics)`. If the harness has no subagents, or every dispatch is refused with the spawn-depth error, apply each lens yourself in sequence, re-reading only the plan and SOURCE_FILES for each, writing its findings under its roster name, and set the mode to `sequential lenses (no subagents: {exact error, or "harness has none"})`. A sequential run still produces verified findings; what it cannot produce is corroboration, and the report must make that visible.
 
 ## 6. Check completion
 
@@ -117,7 +115,7 @@ Print every section header, writing `None.` under an empty one:
 **Plan**: {absolute plan path}
 **Issue**: #{issue_number}
 **Critics**: {roster} ({LITE | FULL})
-**Mode**: {independent roster (M critics) | sequential lenses (Agent tool unavailable: reason)}
+**Mode**: {independent roster (M critics) | sequential lenses (no subagents: reason)}
 **Findings**: {N} total ({b} blockers, {c} concerns, {n} nits)
 
 ## Blockers
@@ -154,12 +152,12 @@ Print every section header, writing `None.` under an empty one:
 
 | Verdict | When | Next step |
 |---|---|---|
-| READY TO BUILD (no concerns) | No BLOCKERs or CONCERNs (NITs don't count) | `/yudame-dev:do-build` |
-| READY TO BUILD (with concerns) | CONCERNs but no BLOCKERs | `/yudame-dev:do-plan` revision pass, then critique again; never straight to build |
-| NEEDS REVISION | One or more BLOCKERs | `/yudame-dev:do-plan` with the blockers |
+| READY TO BUILD (no concerns) | No BLOCKERs or CONCERNs (NITs don't count) | the do-build skill |
+| READY TO BUILD (with concerns) | CONCERNs but no BLOCKERs | the do-plan skill revision pass, then critique again; never straight to build |
+| NEEDS REVISION | One or more BLOCKERs | the do-plan skill with the blockers |
 | MAJOR REWORK | Fundamental problems, or an incomplete roster | Back to issue discussion and re-planning |
 
-A "with concerns" revision is a clarity pass, not rework: `/yudame-dev:do-plan` embeds each concern's Implementation Note in the plan so the builder doesn't re-investigate. The revise-and-recritique loop exits to build when a round comes back with no concerns, or when the pipeline's own bound on concern rounds runs out and the remaining concerns are accepted on the record.
+A "with concerns" revision is a clarity pass, not rework: the do-plan skill embeds each concern's Implementation Note in the plan so the builder doesn't re-investigate. The revise-and-recritique loop exits to build when a round comes back with no concerns, or when the pipeline's own bound on concern rounds runs out and the remaining concerns are accepted on the record.
 
 The Mode line is part of the result: `sequential lenses` tells whoever reads the verdict that no finding was independently corroborated, whatever the Critics line lists.
 

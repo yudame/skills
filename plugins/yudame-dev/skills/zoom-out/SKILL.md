@@ -1,7 +1,7 @@
 ---
 name: zoom-out
 description: "Step back mid-session, check the work against the real goal, and recommend the next focus. Use for 'zoom out' or 'am I on track'."
-allowed-tools: Read, Bash
+allowed-tools: Read Bash
 ---
 
 # Zoom out

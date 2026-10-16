@@ -1,14 +1,14 @@
 ---
 name: ontologies
 description: "Build or update a project's domain vocabulary in ONTOLOGIES.md. Use for 'name things', 'what do we call X', or competing terms."
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+allowed-tools: Read Write Edit Bash Grep Glob
 ---
 
 # Ontologies
 
-Maintain `ONTOLOGIES.md` at the repo root (next to CLAUDE.md): the canonical vocabulary of the domain, so people and agents use one name per concept, know what each name does not mean, and notice when a single name is covering two concepts.
+Maintain `ONTOLOGIES.md` at the repo root (next to AGENTS.md or CLAUDE.md): the canonical vocabulary of the domain, so people and agents use one name per concept, know what each name does not mean, and notice when one name covers two concepts.
 
-Reach for it when a new concept has arrived under several names, when a review or plan turns on what "X" means versus "Y", before naming a new module, class or API field, or when the user asks.
+Use it when a new concept has arrived under several names, when a review or plan turns on what "X" means versus "Y", before naming a new module, class or API field, or when the user asks.
 
 ## Doing it
 

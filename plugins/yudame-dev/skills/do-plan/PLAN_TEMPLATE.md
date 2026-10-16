@@ -191,8 +191,8 @@ Example: Settings → Click "Enable 2FA" → Setup screen → Enter code → Con
 [Measurable outcomes tied to the appetite.]
 
 - [ ] [Criterion]
-- [ ] Tests pass (`/yudame-dev:do-test`)
-- [ ] Documentation updated (`/yudame-dev:do-docs`)
+- [ ] Tests pass (the do-test skill)
+- [ ] Documentation updated (the do-docs skill)
 - [ ] [If Reachability names a caller: grep confirms the caller references the new code]
 - [ ] [Bug fix: related xfail tests converted to hard assertions]
 
@@ -243,7 +243,7 @@ Roles: `builder` (implementation, the default), `validator` (read-only verificat
 
 ## Verification
 
-[Checks `/yudame-dev:do-build` runs automatically after the build. A check table is identified by a `Command` column within its first three columns; a Verification section with table rows but no `Command` column fails the gate rather than passing on zero checks. Any other table here (a summary, a recap) is skipped as a non-check table.
+[Checks the do-build skill runs automatically after the build. A check table is identified by a `Command` column within its first three columns; a Verification section with table rows but no `Command` column fails the gate rather than passing on zero checks. Any other table here (a summary, a recap) is skipped as a non-check table.
 
 Expected-result grammar:
 - `exit code N`: passes when the exit code equals N (`exit code 1` for "grep found nothing").
@@ -265,7 +265,7 @@ Inverse rows (anti-criteria) assert a No-Go outcome is absent. Add one only when
 
 ## Critique Results
 
-[Filled by `/yudame-dev:do-plan-critique`.]
+[Filled by the do-plan-critique skill.]
 
 | Severity | Critic | Finding | Addressed By | Implementation Note |
 |----------|--------|---------|--------------|---------------------|

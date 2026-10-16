@@ -1,15 +1,14 @@
 ---
 name: cowork
 description: "Design, review, and maintain Claude Code Routines (scheduled cloud agents). Use for 'set up a routine' or moving a local job to one."
+compatibility: Claude Code
 ---
 
 # Routines (formerly "Cowork tasks")
 
 A Claude Code Routine is Anthropic's cloud scheduled agent (reference: [code.claude.com/docs/en/routines](https://code.claude.com/docs/en/routines)). Older setups called these "Cowork tasks"; this is not the Claude Cowork desktop app.
 
-A routine has four parts: a **prompt**, one or more **repos** cloned fresh into a cloud sandbox each run, **connectors** (Anthropic-hosted MCP such as GitHub, Slack, Linear), and a **trigger** (schedule, API call, or GitHub event). Each run is an independent Claude Code session that runs even when the user's machine is off. Nothing persists between runs except what the run commits back (by default only to `claude/`-prefixed branches) or writes to an outside system.
-
-The goal of this skill is a routine that runs unattended, does the right thing, and whose failures a human will notice.
+A routine has four parts: a **prompt**, one or more **repos** cloned fresh into a cloud sandbox each run, **connectors** (Anthropic-hosted MCP such as GitHub, Slack, Linear), and a **trigger** (schedule, API call, or GitHub event). Each run is an independent Claude Code session that runs even when the user's machine is off. Nothing persists between runs except what the run commits back (by default only to `claude/`-prefixed branches) or writes to an outside system. The goal: a routine that runs unattended, does the right thing, and whose failures a human notices.
 
 ## Is it a routine at all?
 

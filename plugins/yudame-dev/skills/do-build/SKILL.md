@@ -11,8 +11,12 @@ You are the build lead. You take a plan document to an open PR whose branch
 does everything the plan's tasks and acceptance criteria ask, with the repo's
 tests and lint passing and the plan's docs written. Builder subagents write the
 code; you sequence them, check their work against the plan, and own the PR.
-Keeping your own hands off the files keeps your context free to verify each
-builder's diff against what the plan asked for, which is where builds go wrong.
+Keeping your hands off the files keeps your context free to verify each diff.
+
+**Sequential mode** (a harness without subagents, such as Pi): you are the
+builder. Run the plan's tasks yourself in dependency order in the one worktree,
+committing after each, then re-read each task's named deliverables against the
+diff before moving on. Everything else below applies unchanged.
 
 ## Repo-specific rules
 
@@ -25,8 +29,8 @@ and subagents.
 ## Resolve the plan
 
 `$ARGUMENTS` is a plan path or an issue number (`17`, `#17`). If it is empty or
-the literal `$ARGUMENTS`, take it from the invoking message or the most recently
-named plan or issue in the conversation. If it is still ambiguous, ask which
+the literal `$ARGUMENTS`, use what followed the skill name in the message, or the
+most recently named plan or issue in the conversation. If it is still ambiguous, ask which
 plan; never pick one.
 
 For an issue number, find the `docs/plans/*.md` whose frontmatter has
@@ -51,28 +55,24 @@ it differs, derive `TARGET_GH_REPO` from its `origin` remote and pass
   git -C "$TARGET_REPO" worktree add "$TARGET_REPO/.worktrees/{slug}" -b session/{slug} \
     || git -C "$TARGET_REPO" worktree add "$TARGET_REPO/.worktrees/{slug}" session/{slug}
   ```
-  One plan, one slug, one branch, one worktree. GitHub allows one open PR per
-  head branch, so this convention is what stops duplicate PRs when a build is
-  retried or run twice. If `session/{slug}` already has commits, resume: build
+  One plan, one slug, one branch, one worktree: GitHub allows one open PR per
+  head branch, so this stops duplicate PRs on a retried build. If `session/{slug}` already has commits, resume: build
   only what is missing.
-- Create a task (`TaskCreate`) for every plan task and wire dependencies
-  (`TaskUpdate` with `addBlockedBy`). The task list is your checklist; the build
-  isn't done while any item is open.
+- Keep a checklist of every plan task with its dependencies (in Claude Code,
+  the task tools). The build isn't done while any item is open.
 
 ## Run the builders
 
 Dispatch each task to a general-purpose subagent, respecting dependencies. Run
-tasks marked `Parallel: true` together by making several Task calls in the same
-message; concurrent builders in the one worktree must touch disjoint files. When
+tasks marked `Parallel: true` together; concurrent builders in the one worktree must touch disjoint files. When
 a plan's tasks are small and strictly sequential, give one builder the whole
 ordered list in a single prompt: a dispatch-and-verify round trip per tiny task
 costs more time than the coding.
 
-**Always `run_in_background: false`.** This skill runs in a forked context that
-gets one turn. A background child notifies a later turn that never comes; the
-fork then ends with "I'll continue when it completes", leaving no PR. The same
-applies to commands: run tests and scripts to completion and read their result
-in this turn, polling any backgrounded command until it exits. Don't use
+**Run everything in the foreground** (Claude Code note: always
+`run_in_background: false`). This skill runs in a forked context that gets one
+turn; a background child notifies a turn that never comes, leaving no PR. Run
+tests and scripts to completion and read their result in this turn. Don't use
 agent-team teammates either: an idle teammate is not a finished one.
 
 Builder prompt:
@@ -87,7 +87,7 @@ checking the branch out elsewhere fails because the worktree holds it.
 Plan context: {goal, relevant plan sections, relevant files, acceptance criteria}
 Your assignment: {the task's actions and named deliverables}
 {If the task has a `Domain: <tag>` line: that domain's rules from the
-/yudame-dev:do-plan skill's DOMAIN_FRAMING.md}
+do-plan skill's DOMAIN_FRAMING.md}
 
 Commit at logical checkpoints as you go, not one batch at the end. Use
 `--no-verify` only on WIP commits mid-task if the repo has a slow auto-fixing
@@ -113,8 +113,8 @@ A completion report is a claim; the diff is the evidence.
   the diff. For anything missing, continue the same builder (foreground, via its
   agent id) with a precise brief of what is still missing, rather than accepting
   the report or restarting the task.
-- **A bare shell command as the final message** (`git ...`, `pytest ...`) with no
-  tool calls means the child couldn't run tools. Re-dispatch once on a
+- **A bare shell command as the final message** with no tool calls means the
+  child couldn't run tools. Re-dispatch once on a
   general-purpose agent; if it repeats, fail the task and report.
 - **On a builder failure**, commit whatever is in the worktree as a WIP safety
   net before deciding to retry, skip, or abort. Don't proceed past a failure that
@@ -127,8 +127,8 @@ Before docs and the PR, all of these must hold:
 - Every task's deliverables are in the diff, and `git log main..HEAD` in the
   worktree has at least one commit. Zero commits means the build failed: report
   it with each task's status, and never push or open a PR.
-- The repo's test suite passes in the worktree (use `/yudame-dev:do-test` or its
-  runner directly). Failures go to `/yudame-dev:do-patch`, then re-test.
+- The repo's test suite passes in the worktree (run the do-test skill or the
+  repo's runner). Failures go to the do-patch skill, then re-test.
 - Each `## Verification` row in the plan, run in the worktree, gives its
   `Expected` result.
 - The acceptance criteria are met, including user-visible behavior (the output,
@@ -162,14 +162,13 @@ duplicate.
 
 Then:
 
-- Run `/yudame-dev:do-docs {pr}` with the plan path, a one-line goal, and the issue
+- Run the do-docs skill on `{pr}` with the plan path, a one-line goal, and the issue
   number. It updates existing docs the change affects and commits to the PR
   branch; finding nothing is fine.
 - Remove the worktree but keep the branch, since the PR uses it:
-  `git -C "$TARGET_REPO" worktree remove "$TARGET_REPO/.worktrees/{slug}" && git -C "$TARGET_REPO" worktree prune`.
-  A local branch can't be deleted while a worktree references it, which is why
-  post-merge cleanup removes the worktree first.
-- Leave the plan in place. `/yudame-dev:do-merge` and `/yudame-dev:do-docs` read it; it is
+  `git -C "$TARGET_REPO" worktree remove "$TARGET_REPO/.worktrees/{slug}" && git -C "$TARGET_REPO" worktree prune`,
+  so post-merge cleanup can delete the branch.
+- Leave the plan in place. The do-merge and do-docs skills read it; it is
   retired after merge.
 
 Keep your own shell in the main repo throughout: use `git -C` and `(cd ... && ...)`

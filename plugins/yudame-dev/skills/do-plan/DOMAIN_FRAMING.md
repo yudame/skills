@@ -1,8 +1,8 @@
 # Domain Framing
 
-There are no standing specialist agents. When a plan task needs domain expertise, assign a general builder (or a reviewer for review-only work), add a `Domain: <tag>` line to the task, and paste the matching rules below into the task's assignment. `/yudame-dev:do-build` reads the tag to inject the same rules, and reviewers use it to know what to check.
+There are no standing specialist agents. When a plan task needs domain expertise, assign a general builder (or a reviewer for review-only work), add a `Domain: <tag>` line to the task, and paste the matching rules below into the task's assignment. The do-build skill reads the tag to inject the same rules, and reviewers use it to know what to check.
 
-These are only the rules a strong general model tends not to apply unprompted. The repo's own conventions (its CLAUDE.md, contributing docs, enforced hooks) take precedence and are not restated here.
+These are only the rules a strong general model tends not to apply unprompted. The repo's own conventions (its AGENTS.md or CLAUDE.md, contributing docs, enforced hooks) take precedence and are not restated here.
 
 ## `Domain: async` (concurrency, event loop)
 

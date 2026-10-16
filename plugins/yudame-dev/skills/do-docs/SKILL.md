@@ -22,7 +22,7 @@ Read the change in full, not just the diff: `gh pr view <n> --json title,body,fi
 
 Come out with: what changed (files, functions, config keys, commands), public-interface and behavior changes, key identifiers docs might mention, and **retired terms**: the old names, paths, and concepts the change replaced. Retired terms drive the stale-reference sweep and catch the most misses.
 
-In parallel, inventory the docs (`git ls-files '*.md' 'docs/**' 'README*'`), noting each file's purpose and the identifiers it references from headings and grep, without reading everything in full. For large changes, subagents work well for the change read, the inventory, and the issue scan below. Give them a Bash-capable agent type (general-purpose or similar): a sub-agent without shell tools can't run its first `git` command and wedges, emitting the command as text with zero tool calls.
+In parallel, inventory the docs (`git ls-files '*.md' 'docs/**' 'README*'`), noting each file's purpose and the identifiers it references from headings and grep, without reading everything in full. For large changes, subagents work well for the change read, the inventory, and the issue scan below; give them shell tools, or they wedge on the first `git` command. Without subagents, do these yourself in sequence.
 
 ## Find affected docs
 
@@ -62,4 +62,4 @@ When `gh` and issues are available, check open issues (`gh issue list --state op
 
 Report: the triggering change, docs updated (with what changed), docs reviewed and still accurate, issues opened for review, and open issues commented on.
 
-Pairs with `/yudame-dev:do-build` (run after a build ships), `/yudame-dev:do-plan` (plans may need updating when prerequisites land), and `/yudame-dev:do-pr-review` (to check docs match implementation).
+Pairs with the do-build skill (run after a build ships), the do-plan skill (plans may need updating when prerequisites land), and the do-pr-review skill (to check docs match implementation).

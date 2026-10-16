@@ -2,18 +2,18 @@
 name: audit-models
 description: "Audit a repo's data models (Popoto/Redis or other ORM) for relationship gaps, missing fields, and naming drift."
 disable-model-invocation: true
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read Grep Glob Bash
 ---
 
 # Model Audit
 
-Surface structural weaknesses in the data-model layer: relationship gaps, missing fields, naming drift, implicit coupling. The output is a findings report for the user to review with whoever owns the architecture. Do not change any model; deciding which findings are real problems and which are deliberate is a human call.
+Surface structural weaknesses in the data-model layer: relationship gaps, missing fields, naming drift, implicit coupling. The output is a findings report for the user and whoever owns the architecture. Do not change any model; which findings are real problems and which are deliberate is a human call.
 
 ## Scope and conventions
 
 Models usually live in `models/*.py` (skip `__init__.py`); if not, find them by searching for the ORM's base class. Read every model and extract its class name, fields, field types, and key kinds (for Popoto: `KeyField`, `Field`, `SortedField` and so on; adapt to whatever ORM the repo uses). Build a cross-model field matrix and run the checks against it.
 
-Before judging, look for the repo's own model conventions in CLAUDE.md, a models README, or the docs: which fields are universal, which models are exempt, which field names are deprecated. Declared conventions override the defaults below.
+Before judging, look for the repo's own model conventions in AGENTS.md or CLAUDE.md, a models README, or the docs: which fields are universal, which models are exempt, which field names are deprecated. Declared conventions override the defaults below.
 
 ## Checks
 

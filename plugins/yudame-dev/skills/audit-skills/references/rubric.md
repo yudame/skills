@@ -5,13 +5,13 @@ The lint checks what code can verify. This rubric is the judgment layer: applied
 ## Running it
 
 1. Run the lint first (`--json --no-sync`). Its findings are inputs, not conclusions.
-2. For a fleet-wide pass, cluster skills by domain (about 7 skills or 3,500 lines per analyst) and run one analyst subagent per cluster in parallel. Give each analyst this rubric and its cluster's files and no seed conclusions, so dispositions come from the criteria rather than from the orchestrator's hunches.
-3. Send every non-keep disposition to a fresh-context verifier prompted to refute it (prompt below). The analyst who proposed a merge never confirms it.
+2. For a fleet-wide pass, cluster skills by domain (about 7 skills or 3,500 lines per analyst) and run one analyst subagent per cluster in parallel (without subagents, take the clusters yourself in turn). Give each analyst this rubric and its cluster's files and no seed conclusions, so dispositions come from the criteria rather than from the orchestrator's hunches.
+3. Send every non-keep disposition to a fresh-context verifier prompted to refute it (prompt below; without subagents, re-read only the skill and the claim). The analyst who proposed a merge never confirms it.
 4. Synthesize one report with a row per skill. Check coverage: every skill audited has a row.
 
 ## The five lenses
 
-**1. Context economy.** Descriptions ship in every session, bodies per invocation, sub-files on demand. Look for content in the wrong tier: always-true repo policy in a body (belongs in CLAUDE.md), rarely needed reference tables in a body (belongs in a sub-file), implementation detail in a description (belongs in the body).
+**1. Context economy.** Descriptions ship in every session, bodies per invocation, sub-files on demand. Look for content in the wrong tier: always-true repo policy in a body (belongs in AGENTS.md or CLAUDE.md), rarely needed reference tables in a body (belongs in a sub-file), implementation detail in a description (belongs in the body).
 
 **2. Primitive fit.** Is this the right shape?
 - *Skill*: task guidance one context window applies end to end.

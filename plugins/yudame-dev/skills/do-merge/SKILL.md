@@ -7,11 +7,11 @@ description: "Verify a reviewed PR is truly ready (green, approved, conflict-fre
 
 You are the last gate before code lands on the base branch. Your job is to
 confirm, from checkable facts, that the PR is finished, then squash-merge it.
-If any fact can't be confirmed, refuse and say exactly which one and what you
-observed. A refused merge is cheap to retry; a bad merge is not.
+If any fact can't be confirmed, refuse and say which one and what you saw.
+A refused merge is cheap to retry; a bad merge is not.
 
-Out of scope: resolving conflicts, rebasing, force-pushing, or fixing CI. The
-gate stops and reports; `/yudame-dev:do-patch` or the author does the fixing.
+Out of scope: resolving conflicts, rebasing, force-pushing, or fixing CI. It
+stops and reports; the do-patch skill or the author does the fixing.
 
 ## Inputs
 
@@ -52,7 +52,7 @@ All of these must hold:
 - Review approved: `reviewDecision == "APPROVED"`, or, if the addendum
   declares a recorded review verdict, that verdict contains `APPROVED`.
   `CHANGES_REQUESTED`, `REVIEW_REQUIRED`, or no review fails and routes back
-  to `/yudame-dev:do-pr-review` or `/yudame-dev:do-patch`. Self-authored PRs often carry their
+  to the do-pr-review or do-patch skill. Self-authored PRs often carry their
   review as a `## Review: Approved` comment instead of a formal review; accept
   that only if it is the latest review comment and postdates the head commit.
 - The body links the tracking issue with `Closes #N`, `Fixes #N`, or
@@ -92,19 +92,19 @@ If the merge command fails (for example branch protection changed since you
 checked), report the error and stop; don't retry blindly.
 
 Then run any addendum post-merge steps. Run each to completion and read its
-result in this turn. This skill often runs as a one-turn subagent, so nothing
+result in this turn. This skill often runs in one turn, so nothing
 will wake you later for a backgrounded command: if you must background
 something, poll it until it exits before you finish.
 
 If you were dispatched by an SDLC supervisor with a run identity and the
 addendum (or the supervisor) names a stage-marker command, write the MERGE
 `in_progress` marker at the start and `completed` after the merge. A failed
-marker write is reported, never a reason to block the merge.
+marker write is reported, never a reason to block.
 
 ## Report
 
-Say what you merged or which precondition failed with its observed value. End
-with an OUTCOME line, which `/yudame-dev:do-sdlc` parses:
+Say what you merged or which precondition failed, with its value. End
+with an OUTCOME line, which the do-sdlc skill parses:
 
 - Merged: `<!-- OUTCOME {"status":"success","stage":"MERGE","artifacts":{"pr_url":"<URL>"}} -->`
 - Refused or failed: `<!-- OUTCOME {"status":"fail","stage":"MERGE","artifacts":{}} -->`

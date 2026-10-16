@@ -2,7 +2,8 @@
 """Skills audit: validate SKILL.md files against canonical template standards.
 
 Runs 21 deterministic validation rules over every skills root the repo has
-(`.claude/skills-global/` and `.claude/skills/`), detects husk directories and
+(`.claude/skills-global/`, `.claude/skills/`, and the Agent Skills roots
+`.agents/skills/` and `~/.agents/skills/` that Codex and Pi read), detects husk directories and
 user-level orphans, and optionally syncs against Anthropic's latest published
 best practices.
 
@@ -57,7 +58,7 @@ def _resolve_repo_root() -> Path:
     cwd = Path.cwd()
     if _is_plugin_root(cwd):
         return cwd
-    if (cwd / ".claude" / "skills-global").is_dir() or (cwd / ".claude" / "skills").is_dir():
+    if any((cwd / d).is_dir() for d in (".claude/skills-global", ".claude/skills", ".agents/skills")):
         return cwd
     return Path(__file__).resolve().parents[3]
 
@@ -68,6 +69,8 @@ SKILLS_DIR = (
 )
 PROJECT_SKILLS_DIR = REPO_ROOT / ".claude" / "skills"
 USER_SKILLS_DIR = Path.home() / ".claude" / "skills"
+AGENTS_SKILLS_DIR = REPO_ROOT / ".agents" / "skills"
+USER_AGENTS_SKILLS_DIR = Path.home() / ".agents" / "skills"
 
 MAX_LINES = 500
 MAX_DESC_LEN = 1024  # Anthropic hard cap
@@ -88,6 +91,10 @@ KNOWN_FIELDS = frozenset(
         "context",
         "agent",
         "hooks",
+        # Agent Skills spec fields (agentskills.io) read by Codex and Pi too
+        "compatibility",
+        "license",
+        "metadata",
     }
 )
 
@@ -773,6 +780,8 @@ def rule_18_unreferenced_sub_files(skill_name: str, body: str, skill_dir: Path) 
         and p.name != "SKILL.md"
         and "__pycache__" not in p.parts
         and p.name != ".DS_Store"
+        # Codex reads agents/openai.yaml itself; no file needs to mention it.
+        and p.relative_to(skill_dir).as_posix() != "agents/openai.yaml"
     ]
     if not sub_files:
         return Finding(skill_name, 18, "PASS", "No sub-files")
@@ -1223,10 +1232,18 @@ def main() -> int:
         roots.append(("global", SKILLS_DIR))
     if PROJECT_SKILLS_DIR.is_dir():
         roots.append(("project", PROJECT_SKILLS_DIR))
+    # Agent Skills roots (Codex, Pi). Entries are often symlinks into a root
+    # above, so a skill reached twice by resolved path is audited once.
+    if AGENTS_SKILLS_DIR.is_dir():
+        roots.append(("agents", AGENTS_SKILLS_DIR))
+    if USER_AGENTS_SKILLS_DIR.is_dir() and USER_AGENTS_SKILLS_DIR.resolve() != AGENTS_SKILLS_DIR.resolve():
+        roots.append(("user-agents", USER_AGENTS_SKILLS_DIR))
 
     skill_paths: list[tuple[str, Path]] = []
+    seen: set[Path] = set()
     for label, root in roots:
-        found = discover_skills(root, args.skill)
+        found = [p for p in discover_skills(root, args.skill) if p.resolve() not in seen]
+        seen.update(p.resolve() for p in found)
         skill_paths.extend((label, p) for p in found)
         if args.skill and found:
             break  # single-skill mode: first root wins
@@ -1257,6 +1274,8 @@ def main() -> int:
             report.add(f)
         if args.fix:
             for label, root in roots:
+                if label == "user-agents":
+                    continue  # never delete from the user's home on --fix
                 for desc in prune_husk_directories(root, label):
                     report.add(Finding(root.name, 0, "PASS", f"Fixed: {desc}", dir=label))
         for label, root in roots:

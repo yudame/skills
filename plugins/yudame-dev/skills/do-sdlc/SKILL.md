@@ -1,29 +1,29 @@
 ---
 name: do-sdlc
-description: "Take an issue to a merged PR by running the /yudame-dev:do-* stages one at a time in subagents. Use for 'ship this issue end to end'."
+description: "Take an issue to a merged PR by running the do-* stage skills one at a time, each in a subagent where the harness has them. Use for 'ship this issue end to end'."
 context: fork
 ---
 
 # do-sdlc: pipeline supervisor
 
 You take one issue (or PR, or feature description) to a merged PR by running the
-`/yudame-dev:do-*` stage skills in order, each inside its own subagent. You assess state,
-pick the stage, dispatch it, read the report, and repeat. You do not write code,
-plans, tests, or docs yourself: a supervisor that starts doing stage work loses the
-clean context it needs to judge each stage's output, and its edits collide with
-the stage that owns the artifact.
-
-Done looks like one of: the PR is merged; the pipeline is already complete; a
-real blocker is reported with its evidence; or the iteration cap is hit with a
-clear account of how far the run got.
+do-* stage skills in order, each inside its own subagent. You assess state,
+pick the stage, dispatch it, read the report, and repeat. Outside sequential mode
+you write no code, plans, tests, or docs yourself: a supervisor doing stage work
+loses the clean context it needs to judge each stage, and collides with the
+stage that owns the artifact.
 
 ## Two modes
 
-- **Supervisor** (the default for `/yudame-dev:do-sdlc`): loop stage after stage until
-  one of the exits above.
+- **Supervisor** (the default): loop stage after stage until one of the exits above.
 - **Router**: when asked for only the next stage, or when another live session is
   already supervising this issue, do the assessment, dispatch one stage, report,
   and return. Never loop in router mode; whoever invoked you owns progression.
+- **Sequential** (a harness without subagents, such as Pi): run each stage
+  skill yourself in this session, in the same order and under the same guards.
+  Before each stage, re-read only that stage's inputs (the issue, the plan
+  file, the PR diff) instead of trusting what earlier stages left in context,
+  and finish one stage's commits before starting the next.
 
 ## Repo-specific rules
 
@@ -38,18 +38,18 @@ the verdict"). That is a mode, not a reason to refuse.
 
 | Stage | Skill | `model:` | Why |
 |-------|-------|----------|-----|
-| ISSUE | /yudame-dev:do-issue | sonnet | Structured writing |
-| PLAN | /yudame-dev:do-plan | opus | Architectural design |
-| CRITIQUE | /yudame-dev:do-plan-critique | opus | Adversarial review |
-| BUILD | /yudame-dev:do-build | sonnet | Tool-heavy plan execution |
-| TEST | /yudame-dev:do-test | sonnet | Deterministic test runs |
-| PATCH | /yudame-dev:do-patch | sonnet | Targeted fix |
-| REVIEW | /yudame-dev:do-pr-review | opus | Code review judgment |
-| DOCS | /yudame-dev:do-docs | sonnet | Structured writing |
-| MERGE | /yudame-dev:do-merge | sonnet | Programmatic gate |
+| ISSUE | do-issue | sonnet | Structured writing |
+| PLAN | do-plan | opus | Architectural design |
+| CRITIQUE | do-plan-critique | opus | Adversarial review |
+| BUILD | do-build | sonnet | Tool-heavy plan execution |
+| TEST | do-test | sonnet | Deterministic test runs |
+| PATCH | do-patch | sonnet | Targeted fix |
+| REVIEW | do-pr-review | opus | Code review judgment |
+| DOCS | do-docs | sonnet | Structured writing |
+| MERGE | do-merge | sonnet | Programmatic gate |
 
-Pass `model:` explicitly on every dispatch; the inherited default is wrong for
-half the stages.
+Claude Code note: pass `model:` explicitly on every dispatch; the inherited
+default is wrong for half the stages.
 
 ## Resolve the input
 
@@ -64,7 +64,7 @@ still exits 0.
 - **Bare description**: in supervisor mode, dispatch ISSUE first and continue
   with the issue it creates. In router mode, return and ask for an issue number.
 
-Never restart from scratch: existing artifacts tell you where to resume.
+Never restart from scratch: existing artifacts show where to resume.
 
 ## Assess state and choose the stage
 
@@ -124,20 +124,20 @@ Apply these when choosing the next stage:
 
 ## Dispatch a stage
 
-One stage at a time, in the foreground: pass `run_in_background: false`. This
-skill runs in a forked context that gets exactly one turn; a background child
+One stage at a time, in the foreground (Claude Code note: pass
+`run_in_background: false`). This skill runs in a forked context that gets exactly one turn; a background child
 notifies a turn that never comes, so the run silently stalls with work
-unpushed. For the same reason, do not use agent-team teammates: an idle
-teammate is not a finished one, and they cannot be reliably resumed. One child
+unpushed. Nor use agent-team teammates: an idle one is not a finished one. One child
 at a time also keeps one writer per artifact; the plan doc in particular is a
-single file no worktree isolates, so never edit it yourself while a stage holds it.
+single file no worktree separates, so never edit it yourself while a stage holds it.
 
 Use a general-purpose subagent (it needs Bash) with this prompt:
 
 ```
 You are executing ONE SDLC stage for issue #{issue} in {repo_path}.
 
-Invoke the Skill tool now: skill "tom:{skill-name}", args "{issue number, PR number, or plan path as the skill expects}".
+Run the {skill-name} skill now (in Claude Code, the Skill tool with
+"yudame-dev:{skill-name}"), on {issue number, PR number, or plan path as the skill expects}.
 The skill is the procedure for this stage; follow it rather than improvising.
 Keep working until the stage is done and checked. Stop early only when you
 cannot go on without the supervisor or before a risky or irreversible step.
@@ -172,18 +172,17 @@ prompt.
 - **Open items with no stated blocker** mean the stage stopped early, not that
   it finished. Re-brief the same stage once, naming the open items. If it stops
   again, treat it as a failure and report.
-- **A bare shell command as the final message** (`git ...`, `gh ...`, `pytest`)
-  with zero tool calls means the child lacked the tools to run it. Re-dispatch
-  once on a general-purpose agent; if it repeats, stop and report the mismatch.
+- **A bare shell command as the final message** with zero tool calls means the
+  child lacked the tools. Re-dispatch once on a general-purpose agent; if it
+  repeats, stop and report the mismatch.
 
 ## Loop and exits (supervisor mode)
 
 After each stage, reassess and dispatch the next. Write one progress line per
 iteration, for example `CRITIQUE done (READY TO BUILD), dispatching BUILD on sonnet`.
 
-Cap the run at 15 dispatches. A happy path is 8; the cap sits above realistic
-patch and re-review cycles, and the oscillation rule catches real loops well
-before it.
+Cap the run at 15 dispatches. A happy path is 8; the oscillation rule catches
+real loops well before the cap.
 
 Exit when:
 - MERGE reports a merge and `gh pr view {pr} --json state,mergedAt` confirms
@@ -193,9 +192,8 @@ Exit when:
   conflict needs a human: stop and report.
 - The cap is reached: stop and report how far it got.
 
-Don't stop to check in between stages: status lines go in the same message as
-the next dispatch. The only stops that need the human are the blocked ones
-above, or a risky action the stage skill itself flags.
+Don't stop to check in between stages; status lines go with the next dispatch.
+Stop for the human only when blocked as above, or at a risky action a stage flags.
 
 ## Final report
 

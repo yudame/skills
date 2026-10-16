@@ -1,7 +1,7 @@
 ---
 name: ask-me
 description: "Interview the user one question at a time to unblock decisions only they can make. Use for 'ask me', 'interview me', or after deep work stalls."
-allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
+allowed-tools: Read Grep Glob Bash AskUserQuestion
 ---
 
 # Ask me
@@ -32,7 +32,7 @@ The detail to include is the detail that changes the answer; leave out everythin
 
 **Name your key assumption inside the question.** Your framing rests on a model (an architecture, a cost, a constraint) the user may not share and that may be wrong. A compact "under X, …" lets them correct the premise in one reply instead of answering the wrong question.
 
-**Use `AskUserQuestion`, one question per call.** Frame it as open: two to four options as concrete illustrations of the space, your recommendation first and labeled `(Recommended)` when you have one, and the built-in "Other" to catch the answer you didn't anticipate. You're seeking direction, not steering them through your menu. Ask questions together only when they are genuinely independent, meaning neither answer could reframe or moot the other; otherwise they're a sequence, and a batch can't adapt.
+**Ask one question at a time, with 2-4 options.** Frame it as open: the options are concrete illustrations of the space, your recommendation first and labeled `(Recommended)` when you have one, and room for a free answer you didn't anticipate. You're seeking direction, not steering them through your menu. Ask questions together only when they are genuinely independent, meaning neither answer could reframe or moot the other; otherwise they're a sequence, and a batch can't adapt.
 
 **Adapt after each answer.** A directional answer often makes downstream detail questions moot, so drop them; if it opens a new fork, add it.
 

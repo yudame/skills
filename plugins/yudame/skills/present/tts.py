@@ -2,7 +2,7 @@
 # requires-python = ">=3.10,<3.13"
 # dependencies = ["kokoro-onnx>=0.4", "soundfile"]
 # ///
-"""Text to speech for /yudame:present: Kokoro (local neural) first, macOS `say` as fallback.
+"""Text to speech for the present skill: Kokoro (local neural) first, macOS `say` as fallback.
 
 One clip:   uv run tts.py --text "Hello." --out brief.m4a
 Scenes:     uv run tts.py --scenes scenes.json --out-dir public/vo

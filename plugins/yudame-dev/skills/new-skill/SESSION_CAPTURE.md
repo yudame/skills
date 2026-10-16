@@ -8,7 +8,7 @@ Before asking anything, work out from the conversation: the process and its inpu
 
 ## 2. Confirm with the user
 
-Use AskUserQuestion for these questions, offering concrete choices (the tool already gives the user a free-text option, so don't add a "something else" choice). Ask only what the session didn't already answer, and for a simple process one or two rounds is enough. Cover:
+Ask these one question at a time with 2-4 concrete options; the user can always answer freely. Ask only what the session didn't already answer, and for a simple process one or two rounds is enough. Cover:
 
 - **Name, description, goal, and done condition** you propose.
 - **The steps** as a numbered list, plus suggested arguments if it takes any.
@@ -19,6 +19,6 @@ Use AskUserQuestion for these questions, offering concrete choices (the tool alr
 
 ## 3. Write and save
 
-Build the SKILL.md from [WORKFLOW_TEMPLATE.md](WORKFLOW_TEMPLATE.md), with `allowed-tools` set to the permission patterns actually used in the session. Show the complete file in a fenced block, ask a one-line AskUserQuestion ("Save this SKILL.md?"), then write it.
+Build the SKILL.md from [WORKFLOW_TEMPLATE.md](WORKFLOW_TEMPLATE.md), with `allowed-tools` set to the permission patterns actually used in the session. Show the complete file in a fenced block, ask one question ("Save this SKILL.md?"), then write it.
 
 Tell the user where it was saved, how to invoke it (`/<name>` or `/<plugin>:<name>`, with arguments), that it loads in a new session, and that they can edit the file directly to refine it.

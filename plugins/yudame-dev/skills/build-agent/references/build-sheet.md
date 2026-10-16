@@ -41,7 +41,7 @@ Write it to `./<agent-slug>/build-sheet.json` in the working repo (the same fold
     "frameworks": ["FastAPI", "Postgres"],
     "wired_connectors": ["Slack (slack_sdk, token in env)"],   // already plumbed → v0 candidates
     "auth_patterns": "secrets in .env loaded via config/settings.py",
-    "standards": ["CLAUDE.md house style", "ONTOLOGIES.md domain terms"],
+    "standards": ["AGENTS.md or CLAUDE.md house style", "ONTOLOGIES.md domain terms"],
     "available_skills": ["pdf", "xlsx"],         // reuse instead of rebuild
     "data_sources": ["the `events` table", "GitHub commits API"],
     "capability_ceiling": "No real-time; batch/cron only. No phone/SMS."
@@ -67,7 +67,7 @@ Write it to `./<agent-slug>/build-sheet.json` in the working repo (the same fold
       "Summary covers all events from the last 24h window, none older.",
       "No event appears twice.",
       "Output is <= 200 words and posted to the #ops Slack channel.",
-      "Tone matches the house style in CLAUDE.md."
+      "Tone matches the house style in AGENTS.md or CLAUDE.md."
     ]
   },
 

@@ -1,6 +1,6 @@
 # Post the Review
 
-The posting half of `/yudame-dev:do-pr-review`: turn the verdict into a GitHub review,
+The posting half of the do-pr-review skill: turn the verdict into a GitHub review,
 make sure it landed, and get its URL.
 
 ## Identity
@@ -80,7 +80,7 @@ This PR can't be reviewed until it merges cleanly against its base.
 - **mergeStateStatus:** `<value>`
 
 Please rebase onto the current base (or merge it in), resolve the conflicts,
-push, and re-run `/yudame-dev:do-pr-review`. No code review was performed.
+push, and re-run the do-pr-review skill. No code review was performed.
 ```
 
 Closed comment:
@@ -89,7 +89,7 @@ Closed comment:
 ## Review: PR Closed
 
 This PR is not open (`state=<STATE>`); review skipped. If it was closed in
-error, reopen it and re-run `/yudame-dev:do-pr-review`.
+error, reopen it and re-run the do-pr-review skill.
 ```
 
 ## Plan checkbox sync (approvals only)
@@ -114,7 +114,7 @@ The order matters. Merge gates treat a review older than the latest commit as
 stale, so a tick commit pushed after the approval would immediately invalidate
 it and force another review round. If the push fails, don't post the approval
 (it would point at a commit that only exists locally); stop and emit
-`<!-- OUTCOME {"status":"fail","stage":"REVIEW","verdict":"PUSH_FAILED","artifacts":{},"notes":"tick commit failed to push; review not posted","next_skill":"/yudame-dev:do-patch"} -->`.
+`<!-- OUTCOME {"status":"fail","stage":"REVIEW","verdict":"PUSH_FAILED","artifacts":{},"notes":"tick commit failed to push; review not posted","next_skill":"do-patch"} -->`.
 
 ## Confirm it landed
 

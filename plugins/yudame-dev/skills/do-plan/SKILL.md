@@ -1,12 +1,12 @@
 ---
 name: do-plan
 description: "Turn a request or issue into a grounded plan document a builder can execute. Use for 'make a plan', 'plan this', or scoping work."
-allowed-tools: Read, Write, Edit, Glob, Bash, AskUserQuestion, ToolSearch, WebSearch, Agent
+allowed-tools: Read Write Edit Glob Bash AskUserQuestion ToolSearch WebSearch Agent
 ---
 
 # Make a Plan (Shape Up)
 
-Turn a request or GitHub issue into a plan document that a builder can execute without re-investigating: a narrowed problem, an appetite, a rough solution, the rabbit holes and boundaries, and machine-checkable verification. The plan lives at `docs/plans/{slug}.md` (snake_case slug), is linked to a tracking issue, and goes to `/yudame-dev:do-plan-critique` before `/yudame-dev:do-build`.
+Turn a request or GitHub issue into a plan document that a builder can execute without re-investigating: a narrowed problem, an appetite, a rough solution, the rabbit holes and boundaries, and machine-checkable verification. The plan lives at `docs/plans/{slug}.md` (snake_case slug), is linked to a tracking issue, and goes to the do-plan-critique skill before the do-build skill.
 
 A good plan is grounded in the code as it is today, not as the issue described it weeks ago; it is sized by how much alignment the work needs, not by coding time; and every open question left in it is one only a human can answer.
 
@@ -45,11 +45,11 @@ A bug that no longer reproduces is a question for the user (close the issue?), n
 
 **Prior art.** Search closed issues and merged PRs for the same problem (`gh issue list --state closed --search "..." --json number,title,closedAt,url`, same for `gh pr list --state merged`). Fill Prior Art; if earlier fixes failed, work out why (wrong root cause, wrong layer, symptom-only, regressions) and fill Why Previous Fixes Failed. Skip for small greenfield work.
 
-**Blast radius and data flow.** Map the files the change touches with `git grep` and Grep/Glob over the named symbols. Route what you find: files to modify go in Solution, dependents in Risks, tests in Test Impact and Success Criteria, docs in Documentation, tangential coupling in Rabbit Holes. When the change crosses components, trace the data flow from entry point to output so the fix lands at the right layer. If the repo keeps infrastructure docs (for example `docs/infra/`), check them for rate limits, quotas, and deploy constraints.
+**Blast radius and data flow.** Map the files the change touches with `git grep` over the named symbols. Route what you find: files to modify go in Solution, dependents in Risks, tests in Test Impact and Success Criteria, docs in Documentation, tangential coupling in Rabbit Holes. When the change crosses components, trace the data flow from entry point to output so the fix lands at the right layer. If the repo keeps infrastructure docs (for example `docs/infra/`), check them for rate limits, quotas, and deploy constraints.
 
 **Expected-failure tests (bug fixes).** Search for tests that document the bug as an expected failure: `grep -rn 'pytest.mark.xfail\|pytest.xfail(' tests/` in Python, or the equivalent skip/known-failure mechanism elsewhere. Each related one becomes a task to convert it into a hard assertion. Runtime `pytest.xfail()` calls inside a test body matter most: they short-circuit before the assertions, so they keep passing after the bug is fixed and pytest's XPASS detection never sees them.
 
-**External research.** When the work involves external libraries, APIs, or ecosystem patterns, run one to three web searches for current docs, best practices, and known pitfalls or breaking changes. WebSearch may be a deferred tool; load it with `ToolSearch("select:WebSearch")`. Record queries, findings with URLs, and how each shapes the approach in `## Research`. Skip for purely internal work.
+**External research.** When the work involves external libraries, APIs, or ecosystem patterns, search the web if you can, one to three queries, for current docs, best practices, and known pitfalls or breaking changes. Record queries, findings with URLs, and how each shapes the approach in `## Research`. Skip for purely internal work.
 
 ## 2. Shape the solution
 
@@ -60,7 +60,7 @@ A bug that no longer reproduces is a question for the user (close the issue?), n
 
 ## 3. Resolve assumptions with spikes
 
-List the assumptions an agent could verify (by reading code, researching, or prototyping) and resolve them before writing, so only genuine human-judgment questions reach Open Questions. Dispatch spikes as parallel subagents in one message: Explore for code reads, general-purpose for research, and a builder with `isolation: "worktree"` for prototypes so nothing lands in the repo. Each returns a finding with a confidence level and what changes in the plan if the assumption is false. Cap at 2 spikes for Small appetite, 4 for Medium, uncapped for Large. For a fog-forward issue, send survey spikes to a cheaper model and spend your own reasoning on the decision the fog hangs on. Record results in `## Spike Results`.
+List the assumptions an agent could verify (by reading code, researching, or prototyping) and resolve them before writing, so only genuine human-judgment questions reach Open Questions. Dispatch spikes as parallel subagents: read-only ones for code reads and research, and a builder in a throwaway worktree for prototypes so nothing lands in the repo (Claude Code note: `isolation: "worktree"`). Without subagents, run the spikes yourself in sequence, prototypes in a scratch worktree you delete. Each returns a finding with a confidence level and what changes in the plan if the assumption is false. Cap at 2 spikes for Small appetite, 4 for Medium, uncapped for Large. Record results in `## Spike Results`.
 
 ## 4. Write the plan
 
@@ -74,7 +74,7 @@ If the plan adds dependencies, services, external API calls, or deployment chang
 
 ## 5. Commit, push, and link the tracking issue
 
-Plans are documentation: commit them on `main` and push. `/yudame-dev:do-build` creates the feature branch later. If you are on another branch, move to main without carrying unrelated changes, and stage the plan by path, never `git add -A`. If main is protected, use a `plan/{slug}` branch and PR. Do not leave a plan edit uncommitted while you wait on a subagent, critique, or human: other sessions may pull or rebase the same checkout, and an autostash conflict on a plan file has cost a full reconciliation before.
+Plans are documentation: commit them on `main` and push. The do-build skill creates the feature branch later. If you are on another branch, move to main without carrying unrelated changes, and stage the plan by path, never `git add -A`. If main is protected, use a `plan/{slug}` branch and PR. Do not leave a plan edit uncommitted while you wait on a subagent, critique, or human: other sessions may pull or rebase the same checkout, and an autostash conflict on a plan file has cost a full reconciliation before.
 
 Tracking issue:
 - If the plan came from an existing issue, use it: add the `plan` label and prepend `**Plan:** https://github.com/{owner}/{repo}/blob/main/docs/plans/{slug}.md` to its body.
@@ -86,13 +86,13 @@ Check the tracking issue for comments newer than the plan's `last_comment_id` (`
 
 ## 6. Hand off
 
-Add questions that need human input to `## Open Questions`, then reply with the plan path, the tracking issue URL, the key assumptions you made, and a pointer to the Open Questions. The next step is `/yudame-dev:do-plan-critique`.
+Add questions that need human input to `## Open Questions`, then reply with the plan path, the tracking issue URL, the key assumptions you made, and a pointer to the Open Questions. The next step is the do-plan-critique skill.
 
 ## 7. Finalize or revise
 
 After answers come back, incorporate them, remove the Open Questions section, and set `status: Ready`.
 
-On a revision pass after critique (NEEDS REVISION, MAJOR REWORK, or READY TO BUILD with concerns): apply the findings, embedding each concern's Implementation Note into the relevant plan text so the builder does not have to re-investigate. Then set `revision_applied: true` and `revision_applied_at: <ISO-8601 UTC>` in the same edit (the timestamp lets a pipeline router tell this revision from a later unrelated one), commit, and push. A plan revised after a "with concerns" verdict goes back through `/yudame-dev:do-plan-critique`, not straight to build.
+On a revision pass after critique (NEEDS REVISION, MAJOR REWORK, or READY TO BUILD with concerns): apply the findings, embedding each concern's Implementation Note into the relevant plan text so the builder does not have to re-investigate. Then set `revision_applied: true` and `revision_applied_at: <ISO-8601 UTC>` in the same edit (the timestamp lets a pipeline router tell this revision from a later unrelated one), commit, and push. A plan revised after a "with concerns" verdict goes back through the do-plan-critique skill, not straight to build.
 
 Close by asking whether anything feels off (missed edge cases, wrong assumptions); this is the cheapest point to catch them.
 

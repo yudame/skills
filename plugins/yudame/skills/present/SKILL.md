@@ -6,7 +6,7 @@ argument-hint: "<topic, notes or file; defaults to the current conversation> [de
 
 # Present
 
-The artifact tooling already knows how to build a page or a Slides deck. This skill fixes what must hold across every run so presentations look and read the same each time, and it supplies the two things artifacts cannot: a voice and a rendered video.
+The artifact tooling already builds pages and Slides decks. This skill fixes what must hold across runs, and supplies the two things artifacts cannot: a voice and a rendered video.
 
 ## Pick the form
 
@@ -24,8 +24,8 @@ Use the form the user names. Otherwise choose from the occasion, say which in on
 - **Grounded.** Research the real source material (code, docs, the client's own words, recent commits and PRs) before outlining. Something built from general knowledge is not done.
 - **One takeaway.** Before building, write the one sentence the audience must walk away with. Everything that doesn't serve it goes.
 - **Headlines are conclusions.** Every slide title, page section and video scene title is a full sentence, under 15 words, stating its point. Read in order, they make the argument; if they read as a table of contents, rewrite them.
-- **Look.** The project's own style guide or brand first, then the design system the artifact tooling offers, and only when neither exists, `/yudame:house-style`. One accent per view, spent on the value that matters.
-- **Editorial pass.** Anything going to an audience beyond the user (deck, page, video script) goes through `/yudame:de-slop` in a fresh-context subagent given only the draft, the medium and the audience. Act on every flag; after two BLOCKs, show the user both diagnoses instead of shipping.
+- **Look.** The project's own style guide or brand first, then the design system the artifact tooling offers, and only when neither exists, the house-style skill. One accent per view, spent on the value that matters.
+- **Editorial pass.** Anything going to an audience beyond the user (deck, page, video script) goes through the de-slop skill in a fresh context given only the draft, medium and audience (a subagent, or else re-read only the draft file). Act on every flag; after two BLOCKs, show the user both diagnoses instead of shipping.
 - **Done is checkable.** Report the artifact link or the file path, plus whatever proves it: the published artifact, or `ffprobe` duration for audio and video.
 
 ## Deck

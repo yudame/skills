@@ -2,14 +2,15 @@
 name: audit-hooks
 description: "Audit Claude Code hooks for ones that hang, can't block, or fail silently. Use when checking hook health or after changing a hook."
 disable-model-invocation: true
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read Grep Glob Bash
+compatibility: Claude Code
 ---
 
 # Hook Audit
 
-**Goal:** for every hook in scope, report PASS, WARN, or FAIL against the rules below, with a specific fix for each WARN and FAIL. The three things that matter: advisory hooks can never block or stall a session, validators really block what they exist to block, and no hook fails without leaving a trace. This audit is read-only; a human applies the fixes.
+**Goal:** for every hook in scope, report PASS, WARN, or FAIL against the rules below, with a fix for each WARN and FAIL. What matters: advisory hooks can never block or stall a session, validators really block what they exist to block, and no hook fails without leaving a trace. This audit is read-only; a human applies the fixes.
 
-**Scope:** the `hooks` blocks in `.claude/settings.json`, `.claude/settings.local.json`, and `~/.claude/settings.json`, plus `hooks/hooks.json` in any plugin being audited. Some repos generate these blocks from another file; if so, report fixes against the generator, not the generated output. Check the repo's CLAUDE.md for its validator inventory, logging helper, and hook log path; the defaults below apply when it says nothing.
+**Scope:** the `hooks` blocks in `.claude/settings.json`, `.claude/settings.local.json`, and `~/.claude/settings.json`, plus `hooks/hooks.json` in any plugin being audited. Some repos generate these blocks from another file; if so, report fixes against the generator, not the generated output. Check the repo's AGENTS.md or CLAUDE.md for its validator inventory, logging helper, and hook log path; the defaults below apply when it says nothing.
 
 ## How hooks fail
 
@@ -36,7 +37,7 @@ Classify each hook first. A **validator** exists to block bad operations: typica
 8. **Timeouts fit the work.** Roughly 5 s for file reads and JSON, 10 s for git and local tools, 15 s for network APIs. An empty matcher on PreToolUse fires on every tool call, so a timeout over 5 s there is a WARN.
 9. **The hook can actually run.** Every referenced script exists, Python scripts compile, shell scripts are executable, and the logging helper imports from where the hook expects it. Any miss: FAIL.
 
-Finally, if the hook log exists, summarize its last 24 hours: error count, which hooks errored, and the most frequent message.
+Finally, if the hook log exists, summarize its last 24 hours: error count, hooks that errored, the commonest message.
 
 ## Report
 
@@ -54,6 +55,5 @@ Total hooks: 14 | PASS: 11 | WARN: 2 | FAIL: 1
 Hook log (24h): 3 errors, all memory_recall.py: "ConnectionRefusedError"
 
 ### Fixes
-- calendar_prompt_hook.sh: append `|| true` to the command in .claude/settings.json.
-- memory_recall.py: narrow the matcher or cut the timeout to 5s.
+- calendar_prompt_hook.sh: append `|| true` to its command. memory_recall.py: narrow the matcher or cut the timeout to 5s.
 ```

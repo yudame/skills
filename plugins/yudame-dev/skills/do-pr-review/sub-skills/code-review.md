@@ -1,6 +1,6 @@
 # Code Review
 
-The judgment half of `/yudame-dev:do-pr-review`. The PR branch is already checked out.
+The judgment half of the do-pr-review skill. The PR branch is already checked out.
 The aim is a verdict that is grounded, verified, and reproducible: the same PR
 reviewed twice should get the same verdict, and every finding should point at
 code you actually read.
@@ -90,7 +90,7 @@ number you can't reproduce is unverified: don't credit it, and say so.
 
 Also look for legacy cruft: deprecated fields still read or written, fallback
 chains, dual implementations, dead imports, stale comments. If the repo defines
-a cruft-auditor agent, dispatch it. Cruft goes in a `### Legacy Cruft` section
+a cruft-auditor agent, dispatch it (without subagents, apply its rules yourself). Cruft goes in a `### Legacy Cruft` section
 and is advisory.
 
 ## Rubric and verdict
@@ -139,7 +139,7 @@ The verdict follows from the ratings, not from overall impression:
 ## Findings
 
 Severities: **blocker** (breaks functionality, security, or data), **tech_debt**
-(must be fixed before merge; `/yudame-dev:do-patch` handles it), **nit** (fixed unless
+(must be fixed before merge; the do-patch skill handles it), **nit** (fixed unless
 purely subjective), **acknowledged** (listed only under *Acknowledged Deferrals
 (verified)*, never in the other sections).
 

@@ -1,14 +1,14 @@
 ---
 name: do-integration-audit
 description: "Audit a named feature's wiring: orphan code, dead paths, missing tests, config gaps. Use for 'audit this feature's integration'."
-allowed-tools: Read, Grep, Glob, Bash, Agent
+allowed-tools: Read Grep Glob Bash Agent
 argument-hint: "<feature-topic> [--path <dir>] [--severity critical|warning|info]"
 disable-model-invocation: true
 ---
 
 # Feature Integration Audit
 
-Find the gaps between "the code exists" and "the feature works end to end" for one named feature. A feature can be present but unreachable, tested only with mocks, or documented without its entry points. The deliverable is a report in which every finding survives verification. This is read-only: never modify source files; the human decides what to fix.
+Find the gaps between "the code exists" and "the feature works end to end" for one named feature. A feature can be present but unreachable, tested only with mocks, or documented without its entry points. The deliverable is a report in which every finding survives verification. This is read-only: never modify source files; the human decides fixes.
 
 Arguments: `<feature-topic>` (a semantic label such as "authentication" or "billing", not a path), optional `--path <dir>` to scope the search, optional `--severity` to drop findings below a threshold.
 
@@ -45,7 +45,7 @@ Notes taken early in an audit go stale: line numbers shift, hypotheses form befo
 - **Contradictions within one report**, such as "saved only by idempotency" next to "runs side effects twice". Keep the one the code supports.
 - **Hypothesis-confirming search.** For each claim, run the search that would prove you wrong.
 
-Drop findings that don't survive; a smaller correct report beats a larger overstated one. When a finding survives in a changed form, say so inline ("draft claimed X; verification showed Y"). For each CRITICAL finding that survives, give a fresh subagent only the claim and its location and ask it to disprove it, returning PASS, FAIL, or REVISE with reasons. Starting without your notes, it can only reason from the code.
+Drop findings that don't survive; a smaller correct report beats a larger overstated one. When a finding survives in a changed form, say so inline ("draft claimed X; verification showed Y"). For each CRITICAL finding that survives, give a fresh subagent only the claim and its location and ask it to disprove it, returning PASS, FAIL, or REVISE with reasons; without subagents, set your notes aside and re-read only the cited code.
 
 ## Report
 

@@ -8,8 +8,8 @@ argument-hint: "[unit|integration|e2e|tools|performance|<path>|frontend <url> \"
 
 Run the right tests for the request, then say plainly whether this branch is
 safe: what passed, what failed, and for each failure whether this branch caused
-it. Only regressions block. This skill is read-only: it runs tests and reports;
-fixing is `/yudame-dev:do-patch`'s job.
+it. Only regressions block. This skill is read-only; fixing is the do-patch
+skill's job.
 
 The workflow is language-agnostic. Use the project's own runner (`pytest`,
 `cargo test`, `npm test`, `go test ./...`); [PYTHON.md](PYTHON.md) has the pytest
@@ -17,7 +17,7 @@ specifics.
 
 ## Find how this repo tests
 
-Before running anything, read the repo's own guidance: CLAUDE.md or AGENTS.md,
+Before running anything, read the repo's own guidance: AGENTS.md or CLAUDE.md,
 an SDLC addendum such as `docs/sdlc/do-test.md`, a Makefile or package scripts,
 and any project skill about testing. Repos often wrap the runner (a script that
 pins the interpreter, bounds timeouts, or isolates the test database) or forbid
@@ -27,8 +27,8 @@ thresholds.
 
 ## Arguments
 
-`$ARGUMENTS` (if empty or the literal `$ARGUMENTS`, take what follows `/yudame-dev:do-test`
-in the invoking message):
+`$ARGUMENTS` (if empty or the literal `$ARGUMENTS`, use what followed the skill
+name in the message):
 
 | Input | Runs |
 |-------|------|
@@ -49,7 +49,7 @@ changed source file to its tests (`foo/bar.py` to `tests/*/test_bar.py`; changed
 test files run directly; PYTHON.md has the table), and keep only files that
 exist. If nothing maps, say so and run lint only. If git fails, run everything.
 
-Run in the current working directory as-is. When `/yudame-dev:do-build` calls this, the
+Run in the current working directory as-is. When the do-build skill calls this, the
 cwd is already the worktree.
 
 ## Running
@@ -57,10 +57,10 @@ cwd is already the worktree.
 A single target runs directly in this agent. For all tests, run directly too
 unless the suite is large (50 or more test files), there is no `--direct`, and
 the runner has no built-in parallelism you can use instead (such as
-`pytest -n auto`). Then fan out one subagent per test directory, plus one for
-lint, all in a single message with `run_in_background: false`. This skill can
-run in a one-turn forked context, where a background child's notification never
-arrives; same-message foreground calls run concurrently and return together.
+`pytest -n auto`). Then fan out one foreground subagent per test directory,
+plus one for lint, all at once (Claude Code note: `run_in_background: false`;
+in a one-turn fork a background child's notification never arrives). Without
+subagents, run the groups yourself in sequence.
 
 Give each fan-out child the exact command and a hard bound, since a hung child
 holds the whole run: "finish within 10 minutes; pass the runner's own timeout
@@ -81,8 +81,8 @@ part alone.
 
 ## Special targets
 
-**`frontend`**: dispatch one foreground subagent with browser tools (whatever
-browser automation this session has) to run the scenario: URL, scenario, steps
+**`frontend`**: dispatch one foreground subagent with browser tools (or, without
+subagents, drive the browser yourself) to run the scenario: URL, scenario, steps
 (given after `-- steps:` or inferred), and expected result. It drives the
 browser; you don't. When running all tests and `tests/frontend/` holds scenario
 files (`{"url", "scenario", "steps": [...], "expected"}` as JSON or YAML), run one

@@ -1,7 +1,7 @@
 ---
 name: do-design-audit
 description: "Audit a live web UI against a design rubric: a scored finding per dimension and the top three fixes. Use for 'review this design'."
-allowed-tools: mcp__byob__browser_navigate, mcp__byob__browser_read, mcp__byob__browser_click, mcp__byob__browser_screenshot, mcp__byob__browser_close_tab, mcp__byob__browser_list_tabs, mcp__byob__browser_wait_for
+allowed-tools: mcp__byob__browser_navigate mcp__byob__browser_read mcp__byob__browser_click mcp__byob__browser_screenshot mcp__byob__browser_close_tab mcp__byob__browser_list_tabs mcp__byob__browser_wait_for
 context: fork
 ---
 
@@ -89,4 +89,4 @@ Rate each dimension ✅ Premium (deliberate and polished, nothing to do), ⚠️
 [One or two sentences: the quality level stated plainly, the strongest quality, the most critical weakness. No hedging.]
 ```
 
-Fixes follow the project's own style guide or design system (with `/yudame:house-style` only where it has none), at the system level when the problem is systemic, like the type scale or palette; then re-run the audit.
+Fixes follow the project's own style guide or design system (the house-style skill only where it has none), at the system level when the problem is systemic (type scale, palette); then re-run the audit.

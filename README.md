@@ -1,13 +1,13 @@
 # Yudame skills
 
-Claude Code skills from Yudame, as two plugins in one marketplace:
+Agent skills from Yudame, as two plugins in one marketplace. They follow the [Agent Skills](https://agentskills.io) standard and work the same in Claude Code, OpenAI Codex CLI and Pi:
 
 | Plugin | For | Needs |
 |---|---|---|
-| `yudame` | Everyone | Nothing beyond Claude Code; `officecli` and `calendar` need the `officecli` and `gws` command-line tools |
+| `yudame` | Everyone | Nothing beyond the agent; `officecli` and `calendar` need the `officecli` and `gws` command-line tools |
 | `yudame-dev` | Developers | git, and GitHub for the pipeline skills |
 
-Skills load namespaced: `/yudame:present`, `/yudame-dev:do-plan`.
+Invoke a skill as `/yudame:present` in Claude Code, with `$` in Codex (which lists it under its plugin, as `yudame:present`), or as `/skill:present` in Pi. Inside a skill, other skills are named in plain words ("run the de-slop skill"), so each harness resolves them its own way.
 
 Why these skills exist, in principles: [MANIFESTO.md](MANIFESTO.md).
 
@@ -44,6 +44,19 @@ claude plugin install yudame@yudame
 
 The repo is public, so no GitHub account is needed to install.
 
+### Codex and Pi
+
+Both read skills from `~/.agents/skills`. Clone the repo and run its installer:
+
+```
+git clone https://github.com/yudame/skills.git
+cd skills && ./install.sh
+```
+
+It links each `plugins/*/skills/<name>` into `~/.agents/skills/<name>`, pointing at this clone. It is safe to re-run: it replaces only links into a clone of this repo, removes its own links to skills that were deleted, and skips anything else at a skill's name with a one-line notice. After `git pull`, run it again to pick up new or removed skills. Skills that only make sense on demand ship `agents/openai.yaml` so Codex, like Claude Code, loads them only when you call them.
+
+Pi has no subagents, so the skills that fan out (`do-build`, `do-sdlc`, the critics and reviewers) run their steps in sequence there; each skill says how. Pi also reads `~/.pi/agent/skills`, but `~/.agents/skills` covers it.
+
 ## Who "the user" is
 
 Skills are written for whoever is in the conversation: "the user" gets the questions, drafts and approvals. A skill never names the person who wrote it. An autonomous deployment can sit behind the same skills: where a skill asks the user a question or waits for a checkpoint, that deployment answers through its own channel. A repo can change a skill's behavior by shipping a context file the skill probes for (for example `.claude/skill-context/<skill>.md` or `docs/sdlc/<skill>.md`), and no file means the generic behavior in the skill.
@@ -54,7 +67,9 @@ The plugins have no `version`, so each commit on `main` is a new version. `claud
 
 ## Layout
 
-`plugins/<plugin>/skills/<name>/SKILL.md`, plus any files the skill reads. Adding a directory there adds the skill. `yudame` is self-contained. `do-design-audit` in `yudame-dev` falls back to `/yudame:house-style`, so developers should install both.
+`plugins/<plugin>/skills/<name>/SKILL.md`, plus any files the skill reads. Adding a directory there adds the skill. `yudame` is self-contained. `do-design-audit` in `yudame-dev` falls back to the `house-style` skill, so developers should install both. `audit-hooks` and `cowork` are about Claude Code itself and say so in `compatibility`.
+
+`python3 tests/check_skills.py` checks that every skill loads in all three harnesses; `sh tests/check_install.sh` checks the installer.
 
 ## Origin
 

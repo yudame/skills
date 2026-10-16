@@ -1,7 +1,7 @@
 ---
 name: weekly-review
 description: "Summarize recent commits into a plain-text context handoff for another agent or person. Use for a weekly, sprint, or 'last N days' review."
-allowed-tools: Bash, Read, Write
+allowed-tools: Bash Read Write
 argument-hint: "[days]"
 ---
 
