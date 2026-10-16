@@ -7,7 +7,7 @@ Agent skills from Yudame, as two plugins in one marketplace. They follow the [Ag
 | `yudame` | Everyone | Nothing beyond the agent; `officecli` and `calendar` need the `officecli` and `gws` command-line tools |
 | `yudame-dev` | Developers | git, and GitHub for the pipeline skills |
 
-Invoke a skill as `/yudame:present` in Claude Code, with `$` in Codex (which lists it under its plugin, as `yudame:present`), or as `/skill:present` in Pi. Inside a skill, other skills are named in plain words ("run the de-slop skill"), so each harness resolves them its own way.
+Invoke a skill as `/yudame:present` in Claude Code, as `$present` in Codex, or as `/skill:present` in Pi. Inside a skill, other skills are named in plain words ("run the de-slop skill"), so each harness resolves them its own way.
 
 Why these skills exist, in principles: [MANIFESTO.md](MANIFESTO.md).
 
