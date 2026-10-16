@@ -4,7 +4,9 @@ Agent Skills frontmatter (https://agentskills.io/specification) whose
 share a name, since Codex and Pi read them from one flat directory. A skill
 calls another by name in plain words, never as /yudame:x or /yudame-dev:x,
 which only Claude Code resolves, and `allowed-tools` is the spec's
-space-separated string, not a comma list or a YAML list.
+space-separated string, not a comma list or a YAML list. Manual-only skills
+(`disable-model-invocation: true`) also need agents/openai.yaml with
+policy.allow_implicit_invocation: false, since Codex ignores that frontmatter.
 
     python3 tests/check_skills.py [junit.xml]
 """
@@ -32,6 +34,23 @@ def frontmatter(text: str) -> dict[str, str]:
     return {}
 
 
+def manual_only_policy(path: Path) -> bool:
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        return False
+    in_policy = False
+    for line in lines:
+        line = line.split("#", 1)[0].rstrip()
+        if not line.strip():
+            continue
+        if not line.startswith((" ", "\t")):
+            in_policy = line == "policy:"
+        elif in_policy and line.strip() == "allow_implicit_invocation: false":
+            return True
+    return False
+
+
 def problems() -> dict[str, list[str]]:
     found: dict[str, list[str]] = {}
     seen: dict[str, Path] = {}
@@ -43,6 +62,9 @@ def problems() -> dict[str, list[str]]:
             wrong.append(f"name {fields.get('name')!r} is not its directory {skill.parent.name!r}")
         if not 0 < len(fields.get("description", "")) <= 1024:
             wrong.append("description is missing or over 1024 characters")
+        if fields.get("disable-model-invocation", "").lower() == "true":
+            if not manual_only_policy(skill.parent / "agents/openai.yaml"):
+                wrong.append("disable-model-invocation: true requires agents/openai.yaml with policy.allow_implicit_invocation: false")
         tools = fields.get("allowed-tools")
         if tools is not None and ("," in tools or not tools):
             wrong.append(f"allowed-tools {tools!r} is not a space-separated string")

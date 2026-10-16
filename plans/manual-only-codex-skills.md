@@ -23,25 +23,21 @@ Inspected `tests/check_skills.py`, README.md, existing Codex policy files and al
 
 ## Build
 
-1. Extend the existing `problems()` path only for skills whose parsed frontmatter sets `disable-model-invocation: true`. Require a readable `agents/openai.yaml` with `allow_implicit_invocation: false` under `policy`. Report a clear per-skill failure for a missing file or absent/incorrect policy, rather than crashing or accepting mere file existence. Preserve existing CLI and JUnit behavior.
-2. Keep implementation compact, stdlib-only and tailored to the simple block-style policy files this repository ships. Use a small indentation-aware scan or equivalent narrow matching; do not implement general YAML. A comment, a quoted string containing the setting, or the setting in another mapping must not satisfy the requirement. Accept ordinary whitespace and inline comments around the actual setting.
+1. Extend the existing `problems()` path only for skills whose parsed frontmatter sets `disable-model-invocation: true` (case-insensitive, including `True` and `TRUE`). Require a readable `agents/openai.yaml` with `allow_implicit_invocation: false` under `policy`. Report a clear per-skill failure for a missing file or absent/incorrect policy, rather than crashing or accepting mere file existence. Preserve existing CLI and JUnit behavior.
+2. Keep the addition roughly 10–15 lines, stdlib-only and tailored to the block-style policy files this repository ships: scan for a top-level `policy:` then an indented `allow_implicit_invocation: false` within that block, stripping trailing `# comment` text. Do not implement general YAML.
 3. Re-scan the real skills during implementation. Add the two-line policy file to any qualifying skill missing it; preserve other existing config fields. Current inspection requires no skill-file changes. Do not add a file to new-audit-skill merely because its body mentions the flag.
-4. Add focused stdlib `unittest` regression coverage in `tests/test_check_skills.py`, using temporary skill directories and replacing the module's `ROOT` for each fixture. Reuse the existing parser and reporting rather than introducing a separate validation framework. Update the checker's introductory documentation to name this invariant.
+4. Update the checker's introductory documentation to name this invariant. Do not add a second test mechanism or new test file.
 
 ## Verification
 
-Fixture cases:
+Use a throwaway fixture under `/tmp`, replacing the imported module's `ROOT`. Exercise correct policy, missing file, wrong or absent value, no flag, and case-insensitive `True`/`TRUE` flags. Also verify body-only mentions impose no requirement, inline policy comments work, and settings outside the top-level policy block do not pass. Keep CLI/JUnit reporting unchanged; no new CLI or JUnit fixture tests.
 
-- Frontmatter true plus correct policy passes.
-- Frontmatter true plus missing file, empty file, missing key, or true value fails with a useful skill-local diagnostic.
-- Comment-only false, false under another mapping, and false embedded in text do not pass.
-- Normal indentation, whitespace and inline comments in the policy pass.
-- Absent or false frontmatter flag imposes no Codex-file requirement; body/template mentions alone impose none.
-- Multiple skills remain independently reported, so one valid config cannot satisfy another skill.
-- Exercise CLI exit status and generated JUnit for a failing fixture, preserving the current reporting contract.
+Run `python3 tests/check_skills.py` and `sh tests/check_install.sh`. Confirm the real skills remain at zero failures and all imports are stdlib. No live Codex invocation is claimed by these tests.
 
-Run `python3 -m unittest discover -s tests -p 'test_*.py'`, `python3 tests/check_skills.py` (also with a temporary JUnit output path), and `sh tests/check_install.sh`. Confirm the real skills remain at zero failures and all imports are stdlib. No live Codex invocation is claimed by these tests.
+## Critique applied
+
+Dropped the proposed unittest suite and unchanged reporting tests; fixtures run only in temporary storage. Narrowed the policy scan to the existing block format and made the frontmatter comparison case-insensitive. No new test file means README's existing test commands remain accurate.
 
 ## Boundaries and debt
 
-No general YAML dependency/parser, installer changes, new invocation restrictions, frontmatter redesign, CI hooks, approval steps or unrelated skill edits. This is a test assertion of the documented cross-harness invariant explicitly requested by Tom, not a new governance layer. No technical debt additions; the focused tests pay the missing regression coverage. Existing portable-skills work is historical context, not scope to reopen. No open product questions.
+No general YAML dependency/parser, installer changes, new invocation restrictions, frontmatter redesign, CI hooks, approval steps or unrelated skill edits. This is a test assertion of the documented cross-harness invariant explicitly requested by Tom, not a new governance layer. No technical debt additions; the extended checker covers the missing invariant. Existing portable-skills work is historical context, not scope to reopen. No open product questions.
