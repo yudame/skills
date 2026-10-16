@@ -4,7 +4,7 @@ Claude Code skills from Yudame, as two plugins in one marketplace:
 
 | Plugin | For | Needs |
 |---|---|---|
-| `yudame` | Everyone | Nothing beyond Claude Code |
+| `yudame` | Everyone | Nothing beyond Claude Code; `officecli` and `calendar` need the `officecli` and `gws` command-line tools |
 | `yudame-dev` | Developers | git, and GitHub for the pipeline skills |
 
 Skills load namespaced: `/yudame:present`, `/yudame-dev:do-plan`.
@@ -15,6 +15,7 @@ Why these skills exist, in principles: [MANIFESTO.md](MANIFESTO.md).
 
 **`yudame`**
 - Presenting: `present` (deck, page, spoken brief, narrated video; voice via `tts.py`, video via a Remotion template), `house-style` (the fallback look), `de-slop` (the editorial gate), `email`.
+- Office and calendar: `officecli` (Word, Excel and PowerPoint files), `calendar` (Google Calendar through `gws`).
 
 **`yudame-dev`**
 - Work pipeline: `do-issue`, `do-plan`, `do-plan-critique`, `do-build`, `do-test`, `do-patch`, `do-pr-review`, `do-docs`, `do-merge`, with `do-sdlc` to run them in order, and `do-investigation-issue` for unconfirmed findings.
