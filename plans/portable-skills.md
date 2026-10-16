@@ -46,7 +46,8 @@ real risk.
    do-pr-review, do-test).
 4. **`$ARGUMENTS` fallback.** Every skill that reads `$ARGUMENTS`
    (do-plan-critique, do-discover-paths, do-deploy-example, do-build,
-   build-agent, audit-skills, do-test, do-patch, and the new-skill /
+   build-agent, imagine-agent (SKILL.md:32, "the repo in `$ARGUMENTS`"),
+   audit-skills, do-test, do-patch, and the new-skill /
    new-audit-skill templates) carries: "if it is empty or the literal
    `$ARGUMENTS`, use what followed the skill name in the message." Existing
    wordings are kept where they already say this; do-plan-critique's bash
@@ -90,7 +91,10 @@ real risk.
    audit-skills/scripts/audit_skills.py adds `.agents/skills` (project) and
    `~/.agents/skills` (user) to the roots it scans, next to `.claude/skills`;
    symlinked skill directories are followed and a skill reached twice by
-   resolved path is audited once. SKILL.md's description of what is scanned
+   resolved path is audited once. Its KNOWN_FIELDS (audit_skills.py:79-91)
+   gains the Agent Skills spec fields `compatibility`, `license` and
+   `metadata`, so the field this plan adds, and spec-only skills found in
+   `.agents/skills`, are not reported as unknown keys. SKILL.md's description of what is scanned
    is updated.
 8. **do-sdlc namespace.** `skill "tom:{skill-name}"` becomes "run the
    {skill-name} skill (in Claude Code, the Skill tool with
@@ -151,7 +155,8 @@ SKILL.md; a file over on either is trimmed until it is not.
 
 - Rewriting skill logic, rubrics, or the Claude Code-specific rules inside
   audit_skills.py (for example "infra skills must set
-  disable-model-invocation"); only its scan roots change.
+  disable-model-invocation"); only its scan roots and the three spec
+  fields added to KNOWN_FIELDS change.
 - Pi-specific install into `~/.pi/agent/skills` (Pi reads `~/.agents/skills`).
 - Converting plugin packaging (`.claude-plugin`) or adding a Codex/Pi
   marketplace manifest.
@@ -202,7 +207,9 @@ None.
 7. audit-skills: run `audit_skills.py` in a temp repo containing
    `.agents/skills/<x>/SKILL.md`; the skill appears in the report. Run it in
    this repo; it still reports the plugin skills, and with a populated
-   `~/.agents/skills` symlink set no skill is reported twice.
+   `~/.agents/skills` symlink set no skill is reported twice. audit-hooks
+   and cowork (now carrying `compatibility`) raise no unknown-field
+   finding.
 8. Where `codex` or `pi` is installed on this machine, list skills after
    install and confirm all 31 load with no parse warning; where not, the
    delivery names that as unverified.
