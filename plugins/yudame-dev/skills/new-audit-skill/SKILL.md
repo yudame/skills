@@ -34,7 +34,7 @@ Use three severities consistently: **FAIL** (broken, missing, or dangerous; fix 
 
 ## 3. Choose script, prompt, or both
 
-If a check can be written as a regex, a structural test, or an AST walk, put it in `scripts/audit.py` with `--json`, `--fix`, and `--target` flags: it is cheaper, reproducible, and costs no context until run. Checks that need cross-referencing or judgment stay as prose in SKILL.md. Most real audits are a hybrid. Match the instruction style to the check: principles for exploratory judgment, exact procedure for mechanical pass/fail. For more than about ten independent items, have the audit batch them across parallel subagents.
+If a check can be written as a regex, a structural test, or an AST walk, put it in `scripts/audit.py` with `--json`, `--fix`, and `--target` flags: it is cheaper, reproducible, and free until run. Checks that need cross-referencing or judgment stay as prose in SKILL.md. Most real audits are a hybrid. Match the instruction style to the check: principles for exploratory judgment, exact procedure for mechanical pass/fail. For more than about ten independent items, batch them across parallel subagents (without subagents, in sequence).
 
 ## 4. Name and describe it
 
