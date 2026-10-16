@@ -39,7 +39,7 @@ officecli query report.docx paragraph   # CSS-like selectors
 
 ## Many edits at once
 
-`batch` applies a JSON array in one open/save cycle; it continues past a failed item unless given `--stop-on-error`.
+`batch` applies a JSON array in one open/save cycle. By default nothing is applied if any item fails (exit 1); `--best-effort` keeps the items that succeed.
 
 ```bash
 echo '[{"command":"set","path":"/Sheet1/A2","props":{"value":"Alice"}},

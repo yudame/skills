@@ -40,7 +40,7 @@ gws calendar events delete --params '{"calendarId": "primary", "eventId": "ID", 
 - Find the event id with `events list` first. `patch` sends only the fields that change.
 - `+insert` covers a simple timed event and sends no invitation emails. For an all-day or recurring event, or to email attendees, use `events insert --params '{"calendarId": "primary", "sendUpdates": "all"}' --json '{...}'`.
 - `sendUpdates` decides who hears about it: `all` emails every attendee from the logged-in account, `none` (the default) emails no one, though the event still appears on their calendars.
-- `--dry-run` on a `+` helper prints the request without sending it. `gws schema calendar.events.insert` (or any method) lists its parameters.
+- `--dry-run` on any `gws calendar` command prints the request without sending it (the raw methods still need a valid login to build it). `gws schema calendar.events.insert` (or any method) lists its parameters.
 
 ## Before you change anything
 
