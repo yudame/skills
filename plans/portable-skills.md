@@ -62,8 +62,16 @@ real risk.
    - Claude-only fields (`disable-model-invocation`, `context`, `argument-hint`,
      `model`, `user-invocable`) stay.
    - `allowed-tools` becomes a space-separated string in all 14 skills that set
-     it, and in the new-skill and new-audit-skill templates. Tool patterns
-     with spaces inside parentheses are not used. Before converting, confirm
+     it, and in the new-skill and new-audit-skill templates. Its entries keep
+     their Claude tool names (`Agent`, `AskUserQuestion`, `WebSearch`,
+     `ToolSearch`): the field is a Claude Code pre-approval list that other
+     harnesses ignore, so dropping them would only cost Claude Code users
+     prompts. No pattern may contain a space, since a space now separates
+     entries: new-skill/SKILL.md:51's example `Bash(git log:*)` becomes
+     `Bash(git:*)`, and new-skill/WORKFLOW_TEMPLATE.md:9-10 changes from a
+     YAML list with `Bash(gh pr:*)` to a single space-separated string such
+     as `allowed-tools: {{space-separated patterns, e.g. Bash(gh:*) Read}}`.
+     Before converting, confirm
      against the Claude Code skills docs that a space-separated string is
      parsed; if it is not, stop and record that in the delivery rather than
      ship a form Claude Code ignores.
@@ -94,13 +102,20 @@ POSIX sh. Resolves the repo from its own location, not the cwd. For each
 `plugins/*/skills/<name>`, makes `~/.agents/skills/<name>` a symlink to the
 absolute path of that directory. Rules:
 - missing → create the link;
-- a symlink whose target is a `plugins/<plugin>/skills/<name>` directory
-  (this clone or an earlier clone of this repo) → replace it;
-- anything else (a real directory, a file, a link elsewhere) → leave it,
-  print one line saying it was skipped and why;
-- a dangling symlink in `~/.agents/skills` whose target was a
-  `plugins/*/skills/*` path of this repo → remove it (a skill that was
-  deleted or renamed);
+- a live symlink whose target is `<repo>/plugins/<plugin>/skills/<name>`
+  where `<repo>/.claude-plugin/marketplace.json` has `"name": "yudame"`
+  (this clone or another clone of this repo) → replace it. The
+  `plugins/*/skills/*` shape alone is not enough: it is the standard Claude
+  marketplace layout, and another marketplace's `email` or `present` link
+  must survive;
+- anything else (a real directory, a file, a link to another marketplace or
+  elsewhere) → leave it, print one line saying it was skipped and why;
+- a dangling symlink in `~/.agents/skills` → remove it only if its target
+  path starts with this clone's absolute path, or it is listed in
+  `~/.agents/skills/.yudame-installed`, a manifest the installer writes
+  with every link it made (a skill that was deleted or renamed, or a clone
+  that moved). The manifest is rewritten on each run; entries the run
+  did not keep are dropped;
 - running twice changes nothing; prints what it linked, replaced, skipped.
 
 README.md gets a "Codex and Pi" install section: clone, `./install.sh`,
@@ -114,8 +129,15 @@ Layout are reworded to cover all three.
 
 Two new failures per skill:
 - any `/yudame:` or `/yudame-dev:` in any text file under the skill's
-  directory (SKILL.md and every sub-file, scripts and templates included);
-- an `allowed-tools` value containing a comma.
+  directory (SKILL.md and every sub-file, scripts and templates included).
+  A text file is any file that decodes as UTF-8; files that fail to decode
+  are skipped, and any path under a `node_modules` directory is skipped;
+- an `allowed-tools` value containing a comma. The checker's frontmatter
+  parser reads only the line `allowed-tools:` itself, so it also fails an
+  `allowed-tools:` with an empty value followed by indented list lines (the
+  YAML-list form): the spec makes the field a space-separated string, and
+  the list form is not meant to pass. The template fenced inside
+  WORKFLOW_TEMPLATE.md is not frontmatter and is not parsed.
 
 Existing checks unchanged; still one testcase per skill.
 
@@ -148,23 +170,31 @@ None.
 2. The new assertions fail where they should: on a scratch copy, insert
    `/yudame-dev:do-test` into one sub-file and `allowed-tools: Read, Bash`
    into one SKILL.md; each produces exactly one failure for that skill.
-   Also: a space-separated `allowed-tools`, a `Bash(gh:*)` pattern, and a
-   mention of the word "yudame" without the slash form do not fail.
+   Also fail: a YAML-list `allowed-tools` in a SKILL.md. Do not fail: a
+   space-separated `allowed-tools`, a `Bash(gh:*)` pattern, a mention of the
+   word "yudame" without the slash form, a non-UTF-8 file containing the
+   bytes `/yudame:`, and a `node_modules/x.js` containing `/yudame:`.
 3. `tests/check_install.sh` (new, small, runs install.sh with `HOME` set to a
    temp dir):
    - fresh home: one link per skill, each resolving to the right directory;
    - second run: no changes, same link set;
    - a pre-existing real directory and a link to an unrelated path under a
      skill's name survive untouched and are reported as skipped;
-   - a link to the same skill in another clone path of this repo is
-     replaced;
-   - a dangling link to a removed `plugins/*/skills/x` of this repo is
-     removed, a dangling link elsewhere is left;
+   - a link to the same skill in another clone of this repo (its
+     marketplace.json named `yudame`) is replaced;
+   - a link to `<other-repo>/plugins/x/skills/<name>`, where other-repo's
+     marketplace.json names another marketplace, is skipped and reported;
+   - a dangling link into this clone's `plugins/*/skills/x` is removed; a
+     dangling link listed in the manifest is removed; a dangling link
+     elsewhere, not in the manifest, is left;
    - run from another cwd gives the same result.
 4. Static sweep after edits, expecting zero hits outside README.md and
    explicit "Claude Code note" sentences: `/yudame(-dev)?:`, `tom:`,
    `CLAUDE_SKILL_DIR`, `AskUserQuestion`, `WebSearch`, `ToolSearch`,
-   `run_in_background`, `isolation:`.
+   `run_in_background`, `isolation:`. The sweep covers skill bodies and
+   sub-files, not frontmatter: Claude tool names in `allowed-tools` stay
+   (A6). Separately, no `allowed-tools` value contains a space inside
+   parentheses.
 5. Every `disable-model-invocation: true` skill has `agents/openai.yaml` that
    parses as YAML with `policy.allow_implicit_invocation` the boolean false.
 6. Length table: lines and words per SKILL.md, before and after; none
