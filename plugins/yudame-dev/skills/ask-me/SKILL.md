@@ -34,6 +34,8 @@ The detail to include is the detail that changes the answer; leave out everythin
 
 **Ask one question at a time, with 2-4 options.** Frame it as open: the options are concrete illustrations of the space, your recommendation first and labeled `(Recommended)` when you have one, and room for a free answer you didn't anticipate. You're seeking direction, not steering them through your menu. Ask questions together only when they are genuinely independent, meaning neither answer could reframe or moot the other; otherwise they're a sequence, and a batch can't adapt.
 
+**Without a question pop-up** (a chat, a headless session), ask in the conversation as one message: the question with its assumption, the options numbered with your recommendation first, and room for a free answer. Their reply is the answer; send the next question only after it.
+
 **Adapt after each answer.** A directional answer often makes downstream detail questions moot, so drop them; if it opens a new fork, add it.
 
 ## Finishing
