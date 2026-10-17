@@ -1,6 +1,6 @@
 ---
 name: present
-description: "Present in the form the occasion needs: a Slides deck, a one-page explainer, a spoken brief, or a narrated video. Use for 'present this'."
+description: "Present in the form the occasion needs: a deck, a one-page explainer, a spoken brief, or a narrated video, delivered as a phone-readable PDF unless asked otherwise. Use for 'present this' or any document made for someone."
 argument-hint: "<topic, notes or file; defaults to the current conversation> [deck|page|brief|video]"
 ---
 
@@ -26,7 +26,39 @@ Use the form the user names. Otherwise choose from the occasion, say which in on
 - **Headlines are conclusions.** Every slide title, page section and video scene title is a full sentence, under 15 words, stating its point. Read in order, they make the argument; if they read as a table of contents, rewrite them.
 - **Look.** The project's own style guide or brand first, then the design system the artifact tooling offers, and only when neither exists, the house-style skill. One accent per view, spent on the value that matters.
 - **Editorial pass.** Anything going to an audience beyond the user (deck, page, video script) goes through the de-slop skill in a fresh context given only the draft, medium and audience (a subagent, or else re-read only the draft file). Act on every flag; after two BLOCKs, show the user both diagnoses instead of shipping.
-- **Done is checkable.** Report the artifact link or the file path, plus whatever proves it: the published artifact, or `ffprobe` duration for audio and video.
+- **PDF by default.** A deck, a page, or any document made for someone is delivered as a PDF, laid out to read on a phone without zooming, unless another format is asked for (below).
+- **Done is checkable.** Report the PDF's path and the artifact link, or the file path, plus whatever proves it: `pdfinfo` page count and size, the published artifact, or `ffprobe` duration for audio and video.
+
+## PDF
+
+Build the deck or page as one self-contained local HTML file. That file is what gets published as the artifact when the artifact tooling is there, and the same file is printed to PDF with headless Chrome, so the screen and the PDF never drift:
+
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --headless --no-sandbox --disable-gpu --user-data-dir="$(mktemp -d)" \
+  --no-pdf-header-footer --print-to-pdf=out.pdf "file://$PWD/deck.html"
+```
+
+(`google-chrome` or `chromium` on Linux.) `--no-sandbox` is needed when the agent itself runs sandboxed, and is harmless on a local file. Page size and breaks live in the HTML's print CSS, so the command never changes:
+
+- **Page, document, report:** portrait, one column. `@page { size: 108mm 192mm; margin: 0 }` with the margin as body padding (`8mm`, `box-decoration-break: clone`) so the background fills each page. Body 11pt, headings 16 to 20pt, labels no smaller than 8pt. A phone shows the page at about 1.27x, so 11pt reads at about 14pt. In `@media print`, side-by-side columns collapse to one; tables have at most three columns or become stacked rows; images `max-width: 100%`; `break-inside: avoid` on a table or a short block.
+- **Deck:** slides stay landscape, one per page. `@page { size: 192mm 108mm; margin: 0 }`, each slide exactly that size with `break-after: page`. Body at least 18pt, headlines at least 28pt: a phone fits a slide to its width at about 0.72x, so 18pt reads at about 13pt. A slide that won't fit at those sizes is over budget; split it.
+- **Colour:** `print-color-adjust: exact` on `html`, or the background drops out.
+
+Before sending, check it: `pdfinfo out.pdf` for pages and size (306 x 544 pts portrait, 544 x 306 landscape), and `pdftoppm -r 52 -png out.pdf p` gives each page at about phone width (393px); look at them. Text cut off, a column squeezed, or anything you'd zoom to read is not done.
+
+Other formats, only when asked:
+
+- **Google Slides, for editing:** build a `.pptx` with the officecli skill, then upload it to Drive converted to Slides and share it with whoever asked; report the link.
+
+  ```bash
+  gws drive files create --upload deck.pptx \
+    --json '{"name": "<title>", "mimeType": "application/vnd.google-apps.presentation"}'
+  gws drive permissions create --params '{"fileId": "<id>"}' \
+    --json '{"type": "user", "role": "writer", "emailAddress": "<who>"}'
+  ```
+- **Video with voiceover:** the Video form below.
+- **Anything else named** (Word, PowerPoint, an HTML link): make that instead of the PDF.
 
 ## Deck
 
@@ -44,7 +76,7 @@ If the user wants the deck narrated, write speaker notes for the ear (below) and
 
 The page succeeds when a smart newcomer gets the idea faster from it than from a paragraph: a taught explanation, not the same prose in a nicer font. Start from what the reader knows, give a concrete example before the abstraction, and rank what matters instead of presenting five things as equal. Section headers read as an outline, and the page ends where the reader can act. Cut any section that neither teaches nor guides.
 
-Lead with the shape of the idea: a process gets a numbered path or flow, a system a labelled diagram of parts, a comparison side-by-side columns with differences marked, a decision the question, options and the recommendation, events a timeline, one hard concept an analogy and then the mechanism, numbers a few stat tiles or one chart. Light throughout, and it prints the way it screens.
+Lead with the shape of the idea: a process gets a numbered path or flow, a system a labelled diagram of parts, a comparison side-by-side columns with differences marked, a decision the question, options and the recommendation, events a timeline, one hard concept an analogy and then the mechanism, numbers a few stat tiles or one chart. Light throughout, and it prints the way it screens: the PDF is the same file at a phone-shaped page size.
 
 ## Brief
 
