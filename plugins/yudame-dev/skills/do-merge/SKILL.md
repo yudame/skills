@@ -20,8 +20,8 @@ if it still isn't clear, ask.
 
 ## Repo-specific rules
 
-If the repo has a merge addendum (for example `docs/sdlc/do-merge.md`), read it
-first and follow it. Addenda can add gates (lint, lockfile sync, full test
+If the repo has a merge addendum (`docs/sdlc/do-merge.md` or
+`.claude/skill-context/do-merge.md`), read it first and follow it. Addenda can add gates (lint, lockfile sync, full test
 suite, docs), a merge-authorization hook, a recorded review verdict to use in
 place of GitHub's review state, plan migration, and post-merge cleanup. If the
 addendum declares a single merge-predicate command, run it and honor its result
@@ -56,7 +56,9 @@ All of these must hold:
   review as a `## Review: Approved` comment instead of a formal review; accept
   that only if it is the latest review comment and postdates the head commit.
 - The body links the tracking issue with `Closes #N`, `Fixes #N`, or
-  `Resolves #N`, so the issue closes on merge.
+  `Resolves #N`, so the issue closes on merge. If the addendum declares a
+  Linear tracker, a Linear key is the link instead: `Closes ENG-12`, or
+  `Part of ENG-12` when an after-merge step keeps the issue open.
 
 Fail closed: anything you couldn't confirm counts as a failure.
 
