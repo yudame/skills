@@ -38,7 +38,7 @@ For a message of a few sentences, the condensed catalog below is usually enough.
 
 1. **Read the whole draft first.** Note the medium (message, document, deck, web copy), the audience and the author's voice. The target is that voice minus the slop, not a neutral house rewrite.
 2. **Check substance before polishing.** If every tell were stripped, would a piece remain? The draft needs at least one concrete specific the reader didn't already have (a fact, number, name, example or decision) and a discernible point (something the reader should do, decide or newly understand). Missing both means BLOCK with a diagnosis. Polished emptiness sent to a real audience is worse than a rough draft.
-3. **Sweep for tells.** Collect findings with location and category. Judge as a competent human editor would: one "robust" is fine, while a cluster of tells in one paragraph or the same construction three times in a page is the signal. A finding is a pattern, never a banned-word hit.
+3. **Sweep for tells.** Sweep the headings first, as their own pass: every title, heading, subhead, pull-quote, callout, caption and table label, read in a list on its own, apart from the body. Each must be a plain label a person would say aloud to name the section; a slogan, aphorism, epigram or "X, not Y" line is a finding however well it reads (SIGNS.md section 5). Then sweep the body. Collect findings with location and category. Judge as a competent human editor would: one "robust" is fine, while a cluster of tells in one paragraph or the same construction three times in a page is the signal. A finding is a pattern, never a banned-word hit.
 4. **Rewrite with the smallest edit that removes each tell:** delete the filler clause, use the plain word, break the triad, turn the bullet wall into prose. Your replacements come from the same kind of model that produced the tells, so re-scan your own edits afterwards.
 5. **Prose pass.** Re-read the result, especially your edits, against PROSE.md for the overcorrection failure: prose gone staccato, knowing, too clever, or jargon dressed in metaphor. Tell removal gets a draft to not-suspicious; this pass gets it to pleasant to read, with one held register, sentences that breathe, abstractions replaced by plain facts (never by new metaphors), and warmth over wit. This pass rewrites; it doesn't block.
 6. **Report** the verdict and change log below, including anything you flagged but deliberately kept, and why.
@@ -46,7 +46,7 @@ For a message of a few sentences, the condensed catalog below is usually enough.
 ## What the pass leaves alone
 
 - **Substance.** Facts, numbers, names, quotes, commitments and hedges that carry real uncertainty survive verbatim. If a claim looks wrong, flag it in the report rather than fixing it; facts belong to the author.
-- **Voice.** A tell used once with evident intent is not a finding. Removing slop should make the piece sound more like its author.
+- **Voice.** A tell used once with evident intent is not a finding. This never excuses a clever heading or a quotable key line: in headings, plain wins. Removing slop should make the piece sound more like its author.
 - **Structure the medium needs.** Decks need bullets, runbooks need numbered steps, a README needs headings.
 - **Nothing gets added.** No new claims, examples or enthusiasm; the pass removes and rewords.
 - **No overcorrection into punchiness.** Staccato fragments and a punchline per paragraph are their own slop. Fragments are seasoning, about once a page; three consecutive sentences under ten words means merge two; connective tissue ("even so", "which is why") stays.
@@ -54,6 +54,7 @@ For a message of a few sentences, the condensed catalog below is usually enough.
 ## Condensed catalog
 
 - **Slop vocabulary:** delve, tapestry, testament, underscore, pivotal, crucial, robust, seamless, leverage, boasts, foster, elevate, landscape, realm, journey, vibrant, comprehensive, "it's worth noting", "in today's fast-paced world". Use the plain word or delete.
+- **Slogan headings:** titles, headings and key lines written as aphorisms or taglines ("Corrigible by construction.", "Read, then dispatch", "A trigger, not a migration"). Rewrite as a plain label of what the section is about; ask whether anyone would say it aloud.
 - **Negative parallelism:** "not just X, but Y", "it's not about X, it's about Y". Say the true thing directly.
 - **Rule of three:** compulsive triads of adjectives, clauses or examples. Keep the strongest, or use two or four.
 - **Copula avoidance:** "serves as", "functions as", "stands as", "features" where "is" or "has" is meant.
@@ -73,7 +74,7 @@ For a message of a few sentences, the condensed catalog below is usually enough.
 - **Messages and email:** boilerplate openers and closers, three paragraphs for a one-line answer, headers and bold in a short message.
 - **Documents:** scaffolding, bold overuse, section summaries, title-case headings, bullet walls.
 - **Presentations:** bullets are fine; watch for rule-of-three slides, inflated titles, identical rhythm on every slide.
-- **Web and marketing copy:** promotional adjective stacks ("vibrant", "seamless", "nestled"), hedge-hype, negative parallelism in headlines.
+- **Web and marketing copy:** slogan page titles and section headings (the commonest tell on a site), promotional adjective stacks ("vibrant", "seamless", "nestled"), hedge-hype, negative parallelism in headlines.
 
 ## Verdict
 
@@ -82,6 +83,7 @@ DE-SLOP: PASS (edited, 14 changes)   # or PASS (clean), or BLOCK
 
   vocabulary (5)      "leverage" → "use", "pivotal" → cut, ...
   parallelism (2)     "not just a tool, but a partner" → "a tool that ..."
+  headings (3)        "Recover first, then wake on every row" → "Recovery after a crash"
   scaffolding (1)     cut closing paragraph restating the three sections
   boilerplate (2)     cut "I hope this finds you well", "Great question!"
   artifacts (1)       removed stray "[cite: 3]"

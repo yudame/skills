@@ -43,7 +43,7 @@ Two standing caveats:
 
 **Hedge-hype mix.** "Could potentially," "truly unique," "very essential," stacked intensifiers next to stacked qualifiers. *Fix:* one modifier max, and only if it earns its place. Keep hedges that carry real uncertainty ("this may fail under load" is information, not slop).
 
-**Uniform rhythm.** Every sentence 15–25 words, subject-verb-object, often with a medial em dash; every paragraph exactly three sentences. Reads as a metronome. *Fix:* vary length aggressively — a four-word sentence after two long ones is a very human move.
+**Uniform rhythm.** Every sentence 15–25 words, subject-verb-object, often with a medial em dash; every paragraph exactly three sentences. Reads as a metronome. *Fix:* vary length — a short sentence after two long ones is a human move. Short means a complete sentence, not a fragment for effect (see section 5).
 
 ## 3. Tone and content
 
@@ -73,7 +73,19 @@ Two standing caveats:
 
 **Summary tables of things that aren't data.** A two-column table restating the prose ("Aspect / Description"). *Fix:* cut the table or cut the prose — never both.
 
-## 5. Formatting
+## 5. Headings, titles and highlighted lines
+
+These are the most-read words in a piece and the likeliest place for a tell, because a model writing a heading reaches for a slogan. Sweep them as a separate pass. A clever heading is never "voice used with evident intent"; it is the tell.
+
+**Slogan headings.** A title or heading written as an aphorism, epigram, tagline or punchline instead of a label: "Less of Tom's attention than doing it himself.", "Corrigible by construction.", "Recover first, then wake on every row", "Read, then dispatch", "Inside its ceiling, Valor is free", "A limit has to earn its place", "One voice in every chat." Telltales: a full stop on a heading, an inverted or comparative fragment, an imperative pair ("X first, then Y"), a paradox, a heading that only makes sense after reading the section. *Test:* would a person write this line in a table of contents or say it aloud to name the section? Nobody says "let me show you 'less of his attention than doing it himself'"; they say "this is the philosophy section". *Fix:* a plain descriptive label naming what the section is about ("Philosophy: why Valor exists", "Recovery after a crash", "How a chat session handles messages"). Plain beats clever every time.
+
+**"X, not Y" and contrast headings.** "A trigger, not a migration", "The builder keeps its context; the checkers never see it", "Valor changes Valor the way it changes anything". The heading argues instead of labelling. *Fix:* label the subject ("When to migrate", "Which sessions do the work"); let the body make the argument.
+
+**Epigram pull-quotes and key lines.** A highlighted line, pull-quote or callout written to sound quotable ("Work that doesn't converge stops instead of spending on itself.", "Tasks report back to the session, never to the chat."). *Fix:* a plain sentence in the body, or drop the highlight. A callout earns its place with a fact the reader must not miss, said plainly.
+
+**The same shape in body prose.** Sentences built as epigrams, inverted for effect, or cut into fragments for punch ("Real use, not replays.", "Never mid-flight status.", "It shrinks on evidence."). *Fix:* a full, ordinary sentence with a subject and verb, the way you would say it to a colleague.
+
+## 6. Formatting
 
 **Bold overuse.** Mechanical emphasis on **key phrases** in every paragraph, "key takeaways" styling, bolded lead-ins on every bullet. *Fix:* bold only what a scanning reader must not miss — usually nothing.
 
@@ -91,7 +103,7 @@ Two standing caveats:
 
 **Curly/straight quote inconsistency** — smart quotes in one paragraph, straight in the next — betrays pasted-in generated text. *Fix:* normalize to the document's convention.
 
-## 6. Artifacts (always bugs)
+## 7. Artifacts (always bugs)
 
 - Leftover model citation markers: `oaicite`, `contentReference`, `turn0search0`, `[cite: 1]`, `[span_1]`, `grok_card`, `ppl-ai-file-upload`, stray dagger symbols
 - Knowledge-cutoff disclaimers: "As of my last update," "as of [date], I don't have information on"
@@ -100,7 +112,7 @@ Two standing caveats:
 - `utm_source` and other tracking parameters pasted into cited URLs
 - Broken or fabricated references: URLs that 404, invalid DOIs/ISBNs, citations that don't support the claim they're attached to (spot-check any citation that looks too convenient)
 
-## 7. What survives the pass untouched
+## 8. What survives the pass untouched
 
 - Facts, numbers, names, dates, quotes, prices, commitments
 - Hedges carrying real uncertainty ("untested above 10k rows")
