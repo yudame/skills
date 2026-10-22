@@ -1,6 +1,6 @@
 ---
 name: present
-description: "Present in the form the occasion needs: a deck, a one-page explainer, a spoken brief, or a narrated video, delivered as a phone-readable PDF unless asked otherwise. Use for 'present this' or any document made for someone."
+description: "Present in the form the occasion and audience need, reading who it's for first and asking when that's unclear: a deck, a one-page explainer, a spoken brief, or a narrated video, delivered as a phone-readable PDF unless asked otherwise. Use for 'present this' or any document made for someone."
 argument-hint: "<topic, notes or file; defaults to the current conversation> [deck|page|brief|video]"
 ---
 
@@ -8,9 +8,20 @@ argument-hint: "<topic, notes or file; defaults to the current conversation> [de
 
 The artifact tooling already builds pages and Slides decks. This skill fixes what must hold across runs, and supplies the two things artifacts cannot: a voice and a rendered video.
 
+## Read the room
+
+Before choosing a form or outlining, settle who the audience is, what they already know about the topic, and what the occasion is: first contact, a recurring slot, a decision meeting. These decide the opening, the vocabulary and how much ground to cover. Take them from the ask, the conversation and the material. When those leave it open and the answer would change the shape (a "presentation on X" could be for investors, new hires or the team that built X), ask the caller one consolidated question before researching; the caller may be another agent, so ask it the same way. Don't ask what the context already answers, and if no answer comes, build for a smart newcomer.
+
+The two ends of the range:
+
+- **A cold audience** (a public talk, newcomers, anyone meeting the topic for the first time): open on a question or problem they can feel, one that shows why the topic matters. Walk them from knowing nothing to the few concepts that answer it, each step resting on the last and tied back to the opening question, and close by answering it. Plain words throughout; define a necessary term the first time it appears. For a very technical mechanism, borrow one familiar metaphor to carry the hard step, then move to the real thing; don't stack metaphors or stretch one across the whole talk.
+- **A regular audience** (a weekly update, a standing review): no intro and no case for why the topic matters. Lead with what changed since last time and what needs them, in the vocabulary they already share.
+
+Most occasions sit between the two. Place this one and say where, in the same line that names the form.
+
 ## Pick the form
 
-Use the form the user names. Otherwise choose from the occasion, say which in one line, and build; don't ask.
+Use the form the user names. Otherwise choose from the occasion and the audience, say which in one line, and build; the form alone is rarely worth a question.
 
 | The occasion | Form |
 |---|---|
@@ -21,7 +32,7 @@ Use the form the user names. Otherwise choose from the occasion, say which in on
 
 ## What every form shares
 
-- **Grounded.** Research the real source material (code, docs, the client's own words, recent commits and PRs) before outlining. Something built from general knowledge is not done.
+- **Grounded.** Research the real source material (code, docs, the client's own words, recent commits and PRs) before outlining. Something built from general knowledge is not done. Research supplies what's true, not the order to say it in: the order follows the audience's path from the opening question, never the source's layout. Sections of a site or doc stitched together in their original order is a reading, not a presentation.
 - **One takeaway.** Before building, write the one sentence the audience must walk away with. Everything that doesn't serve it goes.
 - **Headlines are conclusions.** Every slide title, page section and video scene title is a full sentence, under 15 words, stating its point. Read in order, they make the argument; if they read as a table of contents, rewrite them.
 - **Look.** The project's own style guide or brand first, then the design system the artifact tooling offers, and only when neither exists, the house-style skill. One accent per view, spent on the value that matters.
@@ -64,17 +75,17 @@ Other formats, only when asked:
 
 Pick the deck's job first, because it decides the opening:
 
-- **Educational or internal:** open with the question or problem that makes the topic matter to someone who has never heard of it. Then walk that newcomer step by step to the few core ideas that answer it, each tied back to the question: what it is in one plain sentence, how it works (happy path, at most five steps), the clever part, how it fits the larger system. Close by answering the question. Plain words throughout; for the most technical idea, one familiar metaphor, used once, not stretched. A tour of a site or codebase follows this arc, not the order of its pages (Tom, 2026-10-22).
+- **Educational:** for a cold audience, the arc from Read the room: the question, the concepts that answer it in the order they build, then the answer. For an internal audience that already knows the surroundings: what it is in one plain sentence, the problem it solves, how it works (happy path, at most five steps), the clever part, how it fits the larger system.
 - **Persuasion or decision** (proposals, client sessions, decision briefs): why, then how, then what. The first slides describe the audience's own situation and problem accurately before any solution appears; leading with the solution is how these decks fail. Each decision gets its own slide with a recommended default they can veto. The cover names who it is prepared for.
 - **Informational** (architecture, audit findings, status): a one-line scope and method note, then the subject. Don't manufacture a problem the audience never raised.
 
-Budgets: a statement slide holds at most 12 words, a concept slide about 40 words of body, a table 5 rows. Over budget means split the slide, never shrink the type. Diagrams show a relationship the text cannot, around seven nodes at most, every arrow labelled. Default when unstated: a general technical audience, 10 to 15 slides at about 30 seconds each.
+Budgets: a statement slide holds at most 12 words, a concept slide about 40 words of body, a table 5 rows. Over budget means split the slide, never shrink the type. Diagrams show a relationship the text cannot, around seven nodes at most, every arrow labelled. Default length when unstated: 10 to 15 slides at about 30 seconds each.
 
 If the user wants the deck narrated, write speaker notes for the ear (below) and make it a video: one scene per slide.
 
 ## Page
 
-The page succeeds when a smart newcomer gets the idea faster from it than from a paragraph: a taught explanation, not the same prose in a nicer font. Start from what the reader knows, give a concrete example before the abstraction, and rank what matters instead of presenting five things as equal. Section headers read as an outline, and the page ends where the reader can act. Cut any section that neither teaches nor guides.
+The page succeeds when a smart newcomer gets the idea faster from it than from a paragraph: a taught explanation, not the same prose in a nicer font. Start from what the reader knows (for a cold reader, the question the page answers), give a concrete example before the abstraction, and rank what matters instead of presenting five things as equal. Section headers read as an outline, and the page ends where the reader can act. Cut any section that neither teaches nor guides.
 
 Lead with the shape of the idea: a process gets a numbered path or flow, a system a labelled diagram of parts, a comparison side-by-side columns with differences marked, a decision the question, options and the recommendation, events a timeline, one hard concept an analogy and then the mechanism, numbers a few stat tiles or one chart. Light throughout, and it prints the way it screens: the PDF is the same file at a phone-shaped page size.
 
@@ -91,7 +102,7 @@ The shape:
 3. **Batched FYIs**, about 20 words: "Three quick FYIs:" then one clause each.
 4. **Close:** "I've got the rest."
 
-Each decision needs its current default, its deadline, and the cost of being wrong; if one is missing and can't be found, ask the user one consolidated question or demote the item. Aim for 55 to 80 words: over 80, cut; under 55, drop the weakest FYI rather than pad. Synthesize it as `.m4a` (or `.ogg` when it's headed for a chat voice note) and report the path, the duration and the transcript. Sending it anywhere is Tom's step, not this skill's.
+Each decision needs its current default, its deadline, and the cost of being wrong; if one is missing and can't be found, ask the user one consolidated question or demote the item. Aim for 55 to 80 words: over 80, cut; under 55, drop the weakest FYI rather than pad. Synthesize it as `.m4a` (or `.ogg` when it's headed for a chat voice note) and report the path, the duration and the transcript. Sending it anywhere is the user's step, not this skill's.
 
 ## Voice
 
@@ -113,4 +124,4 @@ The default engine is Kokoro, a local neural voice (Apache-2.0, free, offline) w
 
 ## Video
 
-Read [VIDEO.md](VIDEO.md) before making one. It covers the Remotion template in `video/`, the exact commands, and the gotchas. The standard: one idea per scene, 5 to 15 seconds each, 60 to 120 seconds overall unless asked otherwise. The voice carries the sentences and the screen carries the headline, the key number or the diagram; on-screen text that duplicates the narration word for word splits the viewer's attention. Scene length comes from the narration's measured duration, never from a guess.
+Read [VIDEO.md](VIDEO.md) before making one. It covers the Remotion template in `video/`, the exact commands, and the gotchas. Scenes follow the same arc as a deck for the same audience. The standard: one idea per scene, 5 to 15 seconds each, 60 to 120 seconds overall unless asked otherwise. The voice carries the sentences and the screen carries the headline, the key number or the diagram; on-screen text that duplicates the narration word for word splits the viewer's attention. Scene length comes from the narration's measured duration, never from a guess.
