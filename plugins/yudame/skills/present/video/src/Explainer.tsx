@@ -26,7 +26,7 @@ const SceneView = ({scene, index}: {scene: Scene; index: number}) => {
   const enter = spring({frame, fps, config: {damping: 200}});
   const narration = Math.ceil(scene.seconds * FPS);
   return (
-    <AbsoluteFill style={{background: CREAM, color: INK, padding: '140px 180px', fontFamily: sans}}>
+    <AbsoluteFill style={{background: CREAM, color: INK, padding: '220px 90px', fontFamily: sans}}>
       <div style={{fontSize: 28, letterSpacing: 4, textTransform: 'uppercase', opacity: 0.6, fontFamily: 'monospace'}}>
         {String(index + 1).padStart(2, '0')}
       </div>
@@ -34,23 +34,22 @@ const SceneView = ({scene, index}: {scene: Scene; index: number}) => {
       <h1
         style={{
           fontFamily: serif,
-          fontSize: 92,
+          fontSize: 88,
           lineHeight: 1.1,
           margin: 0,
-          maxWidth: 1400,
           opacity: enter,
           transform: `translateY(${(1 - enter) * 30}px)`,
         }}
       >
         {scene.title}
       </h1>
-      <ul style={{listStyle: 'none', padding: 0, marginTop: 72}}>
+      <ul style={{listStyle: 'none', padding: 0, marginTop: 80}}>
         {(scene.points ?? []).map((p, i) => {
           // Reveal each point at an even share of the narration, so the screen keeps pace with the voice.
           const at = LEAD_IN + Math.round(((i + 1) * narration) / ((scene.points?.length ?? 0) + 1));
           const o = interpolate(frame, [at, at + 12], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
           return (
-            <li key={p} style={{fontSize: 48, margin: '0 0 28px', opacity: o, display: 'flex', gap: 28}}>
+            <li key={p} style={{fontSize: 50, lineHeight: 1.3, margin: '0 0 40px', opacity: o, display: 'flex', gap: 28}}>
               <span style={{color: i === 0 ? RED : INK}}>—</span>
               {p}
             </li>

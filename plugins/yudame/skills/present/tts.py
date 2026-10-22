@@ -13,9 +13,12 @@ Prints a JSON result on stdout. Exits non-zero, with the reason on stderr, when
 no engine can synthesize.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -26,6 +29,20 @@ MODELS = Path(os.environ.get("KOKORO_MODELS_DIR", Path.home() / ".cache/kokoro-o
 MODEL_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0"
 DEFAULT_KOKORO_VOICE = "am_michael"
 DEFAULT_SAY_VOICE = "Daniel"
+
+# Names espeak says wrong, as Kokoro phonemes. The text, captions and manifest
+# keep the real spelling; only the sound changes. Engels as in Friedrich Engels
+# (ENG-gulz), Yudame as in Spanish "ayudame" without the a (yoo-DAH-meh).
+LEXICON = {
+    "engels": "ˈɛŋɡəlz",
+    "yudame": "judˈɑːmeɪ",
+    "yuda.me": "judˈɑːmeɪ",
+}
+NAMES = re.compile(
+    r"(?P<name>" + "|".join(re.escape(k) for k in sorted(LEXICON, key=len, reverse=True)) + r")(?P<pos>['’]s)?"
+    r"|(?<=\w)\.(?=\w)",  # a dot inside a domain, said "dot"
+    re.IGNORECASE,
+)
 
 
 def duration(path: Path) -> float:
@@ -54,6 +71,44 @@ def to_format(wav: Path, out: Path) -> None:
     wav.unlink()
 
 
+def splice(text: str, phonemize) -> str | None:
+    """Phonemes for `text` with each LEXICON name said as listed, or None when
+    no name occurs. `phonemize` strips its input, as kokoro's does, so the
+    spaces around each piece are put back here."""
+    out, plain, found = [], [], False
+
+    def flush() -> None:
+        piece = "".join(plain)
+        plain.clear()
+        if not piece.strip():
+            out.append(" " if piece else "")
+            return
+        core = piece.strip()
+        sound = core if re.fullmatch(r"[^\w\s]+", core) else phonemize(core)
+        out.append((" " if piece[0].isspace() else "") + sound + (" " if piece[-1].isspace() else ""))
+
+    at = 0
+    for m in NAMES.finditer(text):
+        plain.append(text[at : m.start()])
+        at = m.end()
+        if not m.group("name"):
+            plain.append(" dot ")
+            continue
+        found = True
+        flush()
+        sound = LEXICON[m.group("name").lower()]
+        if m.group("pos"):
+            sound += "ᵻz" if sound.endswith(("s", "z")) else "z"
+        if out and out[-1] and not out[-1].endswith(" "):
+            out.append(" ")  # a name glued to the word before it, as in valorengels
+        out.append(sound)
+        if text[at : at + 1].isalnum():
+            out.append(" ")
+    plain.append(text[at:])
+    flush()
+    return re.sub(" +", " ", "".join(out)).strip() if found else None
+
+
 class Kokoro:
     name = "kokoro"
 
@@ -71,7 +126,11 @@ class Kokoro:
     def wav(self, text: str, path: Path) -> None:
         import soundfile as sf
 
-        samples, rate = self.k.create(text, voice=self.voice, speed=1.0, lang=self.lang)
+        phonemes = splice(text, lambda t: self.k.tokenizer.phonemize(t, self.lang))
+        if phonemes is None:
+            samples, rate = self.k.create(text, voice=self.voice, speed=1.0, lang=self.lang)
+        else:
+            samples, rate = self.k.create(phonemes, voice=self.voice, speed=1.0, lang=self.lang, is_phonemes=True)
         sf.write(str(path), samples, rate)
 
 
