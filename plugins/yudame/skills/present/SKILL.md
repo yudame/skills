@@ -64,7 +64,7 @@ Other formats, only when asked:
 
 Pick the deck's job first, because it decides the opening:
 
-- **Educational or internal:** what it is in one plain sentence, the problem it solves, how it works (happy path, at most five steps), the clever part, how it fits the larger system.
+- **Educational or internal:** open with the question or problem that makes the topic matter to someone who has never heard of it. Then walk that newcomer step by step to the few core ideas that answer it, each tied back to the question: what it is in one plain sentence, how it works (happy path, at most five steps), the clever part, how it fits the larger system. Close by answering the question. Plain words throughout; for the most technical idea, one familiar metaphor, used once, not stretched. A tour of a site or codebase follows this arc, not the order of its pages (Tom, 2026-10-22).
 - **Persuasion or decision** (proposals, client sessions, decision briefs): why, then how, then what. The first slides describe the audience's own situation and problem accurately before any solution appears; leading with the solution is how these decks fail. Each decision gets its own slide with a recommended default they can veto. The cover names who it is prepared for.
 - **Informational** (architecture, audit findings, status): a one-line scope and method note, then the subject. Don't manufacture a problem the audience never raised.
 
