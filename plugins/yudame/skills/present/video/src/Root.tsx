@@ -13,14 +13,15 @@ const props: ExplainerProps = {
   }),
 };
 
+// Vertical, to fill an upright phone. For landscape, swap width and height and look at the frames again.
 export const RemotionRoot = () => (
   <Composition
     id="Explainer"
     component={Explainer}
     defaultProps={props}
     fps={FPS}
-    width={1920}
-    height={1080}
+    width={1080}
+    height={1920}
     durationInFrames={1}
     calculateMetadata={({props}) => ({
       durationInFrames: props.scenes.reduce((sum, s) => sum + sceneFrames(s.seconds), 0),

@@ -42,10 +42,10 @@ Build the deck or page as one self-contained local HTML file. That file is what 
 (`google-chrome` or `chromium` on Linux.) `--no-sandbox` is needed when the agent itself runs sandboxed, and is harmless on a local file. Page size and breaks live in the HTML's print CSS, so the command never changes:
 
 - **Page, document, report:** portrait, one column. `@page { size: 108mm 192mm; margin: 0 }` with the margin as body padding (`8mm`, `box-decoration-break: clone`) so the background fills each page. Body 11pt, headings 16 to 20pt, labels no smaller than 8pt. A phone shows the page at about 1.27x, so 11pt reads at about 14pt. In `@media print`, side-by-side columns collapse to one; tables have at most three columns or become stacked rows; images `max-width: 100%`; `break-inside: avoid` on a table or a short block.
-- **Deck:** slides stay landscape, one per page. `@page { size: 192mm 108mm; margin: 0 }`, each slide exactly that size with `break-after: page`. Body at least 18pt, headlines at least 28pt: a phone fits a slide to its width at about 0.72x, so 18pt reads at about 13pt. A slide that won't fit at those sizes is over budget; split it.
+- **Deck:** vertical, one slide per page, filling an upright phone. `@page { size: 108mm 192mm; margin: 0 }`, each slide exactly that size with `break-after: page`. Body at least 12pt, headlines at least 22pt: a phone shows the page at about 1.27x, so 12pt reads at about 15pt. A slide that won't fit at those sizes is over budget; split it. Landscape (`size: 192mm 108mm`, body at least 18pt, headlines at least 28pt, since a phone shrinks it to about 0.72x) only when someone asks for it, for projecting say.
 - **Colour:** `print-color-adjust: exact` on `html`, or the background drops out.
 
-Before sending, check it: `pdfinfo out.pdf` for pages and size (306 x 544 pts portrait, 544 x 306 landscape), and `pdftoppm -r 52 -png out.pdf p` gives each page at about phone width (393px); look at them. Text cut off, a column squeezed, or anything you'd zoom to read is not done.
+Before sending, check it: `pdfinfo out.pdf` for pages and size (306 x 544 pts, or 544 x 306 for a landscape deck), and `pdftoppm -r 52 -png out.pdf p` gives each page at about phone width (393px); look at them. Text cut off, a column squeezed, or anything you'd zoom to read is not done.
 
 Other formats, only when asked:
 
@@ -99,7 +99,7 @@ Writing for the ear, for every voiced form:
 
 - Contractions throughout; written prose sounds stiff aloud.
 - No issue, PR, port or other multi-digit numbers. TTS reads "1195" as "one thousand one hundred ninety-five", which spends the listener's attention on nothing. Name the work by substance ("the continuation crash").
-- Respell awkward proper nouns in plain dictionary style (`You-duh-may` for Yudame). Never IPA in slashes: the phonemizer reads `/.../` literally, garbling the word and doubling the clip length.
+- Write names as they are spelled. `LEXICON` in `tts.py` gives Kokoro the sound for names it says wrong (Engels, Yudame, yuda.me); when another name comes out wrong, add it there, tuned by transcribing the clip back. Never IPA in slashes in the text: the phonemizer reads `/.../` literally, garbling the word and doubling the clip length.
 - Short sentences with one idea each; a listener can't re-read.
 
 Synthesize with `tts.py` in this skill's directory, run through `uv` (it declares its own dependencies):
