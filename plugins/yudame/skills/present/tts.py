@@ -32,11 +32,11 @@ DEFAULT_SAY_VOICE = "Daniel"
 
 # Names espeak says wrong, as Kokoro phonemes. The text, captions and manifest
 # keep the real spelling; only the sound changes. Engels as in Friedrich Engels
-# (ENG-gulz), Yudame as in Spanish "ayudame" without the a (yoo-DAH-meh).
+# (ENG-gulz), Yudame as in Spanish "ayudame" without the a, stressed first (YOO-dah-meh).
 LEXICON = {
     "engels": "ˈɛŋɡəlz",
-    "yudame": "judˈɑːmeɪ",
-    "yuda.me": "judˈɑːmeɪ",
+    "yudame": "jˈuːdɑmeɪ",
+    "yuda.me": "jˈuːdɑmeɪ",
 }
 NAMES = re.compile(
     r"(?P<name>" + "|".join(re.escape(k) for k in sorted(LEXICON, key=len, reverse=True)) + r")(?P<pos>['’]s)?"
