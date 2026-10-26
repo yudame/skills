@@ -1,12 +1,14 @@
 ---
 name: present
-description: "Present in the form the occasion and audience need, reading who it's for first and asking when that's unclear: a deck, a one-page explainer, a spoken brief, or a narrated video, delivered as a phone-readable PDF unless asked otherwise. Use for 'present this' or any document made for someone."
+description: "Make a real presentation when one is asked for: a landscape deck, a one-page explainer, a spoken brief, or a narrated video, reading who it's for first. Not for a written answer, report or review, which goes as text; for a document too long for a chat it gives only the print recipe (A4/Letter PDF, no design pass). Use for 'present this', 'make a deck', or printing a needed document."
 argument-hint: "<topic, notes or file; defaults to the current conversation> [deck|page|brief|video]"
 ---
 
 # Present
 
 The artifact tooling already builds pages and Slides decks. This skill fixes what must hold across runs, and supplies the two things artifacts cannot: a voice and a rendered video.
+
+Most asks want none of this. A question, a review or a findings report is answered in text, in the chat; when it is too long for that, it is an ordinary document (Document, below), not a deck. Material that is all text is never a deck.
 
 ## Read the room
 
@@ -21,7 +23,7 @@ Most occasions sit between the two. Place this one and say where, in the same li
 
 ## Pick the form
 
-Use the form the user names. Otherwise choose from the occasion and the audience, say which in one line, and build; the form alone is rarely worth a question.
+Use the form the user names. Choose one unasked only when the occasion is a presentation (a room, a call, a listener away from a screen), say which in one line, and build; the form alone is rarely worth a question.
 
 | The occasion | Form |
 |---|---|
@@ -37,12 +39,14 @@ Use the form the user names. Otherwise choose from the occasion and the audience
 - **Headlines are conclusions.** Every slide title, page section and video scene title is a full sentence, under 15 words, stating its point. Read in order, they make the argument; if they read as a table of contents, rewrite them.
 - **Look.** The project's own style guide or brand first, then the design system the artifact tooling offers, and only when neither exists, the house-style skill. One accent per view, spent on the value that matters.
 - **Editorial pass.** Anything going to an audience beyond the user (deck, page, video script) goes through the de-slop skill in a fresh context given only the draft, medium and audience (a subagent, or else re-read only the draft file). Act on every flag; after two BLOCKs, show the user both diagnoses instead of shipping.
-- **PDF by default.** A deck, a page, or any document made for someone is delivered as a PDF, laid out to read on a phone without zooming, unless another format is asked for (below).
+- **Effort matches the ask.** A presentation earns the research, outline and editorial pass above; a Document is the text laid out plainly, with no outline, no headline rewrite and no style choice.
+- **A real presentation.** Text balanced with diagrams, images, charts and tables: every slide or scene carries a visual or is a deliberate statement slide. A run of text-only slides means the material wanted a document.
+- **PDF when delivered.** A deck, a page or a document is delivered as a PDF unless another format is asked for (below).
 - **Done is checkable.** Report the PDF's path and the artifact link, or the file path, plus whatever proves it: `pdfinfo` page count and size, the published artifact, or `ffprobe` duration for audio and video.
 
 ## PDF
 
-Build the deck or page as one self-contained local HTML file. That file is what gets published as the artifact when the artifact tooling is there, and the same file is printed to PDF with headless Chrome, so the screen and the PDF never drift:
+Build the deck, page or document as one self-contained local HTML file. That file is what gets published as the artifact when the artifact tooling is there, and the same file is printed to PDF with headless Chrome, so the screen and the PDF never drift:
 
 ```bash
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
@@ -52,11 +56,12 @@ Build the deck or page as one self-contained local HTML file. That file is what 
 
 (`google-chrome` or `chromium` on Linux.) `--no-sandbox` is needed when the agent itself runs sandboxed, and is harmless on a local file. Page size and breaks live in the HTML's print CSS, so the command never changes:
 
-- **Page, document, report:** portrait, one column. `@page { size: 108mm 192mm; margin: 0 }` with the margin as body padding (`8mm`, `box-decoration-break: clone`) so the background fills each page. Body 11pt, headings 16 to 20pt, labels no smaller than 8pt. A phone shows the page at about 1.27x, so 11pt reads at about 14pt. In `@media print`, side-by-side columns collapse to one; tables have at most three columns or become stacked rows; images `max-width: 100%`; `break-inside: avoid` on a table or a short block.
-- **Deck:** vertical, one slide per page, filling an upright phone. `@page { size: 108mm 192mm; margin: 0 }`, each slide exactly that size with `break-after: page`. Body at least 12pt, headlines at least 22pt: a phone shows the page at about 1.27x, so 12pt reads at about 15pt. A slide that won't fit at those sizes is over budget; split it. Landscape (`size: 192mm 108mm`, body at least 18pt, headlines at least 28pt, since a phone shrinks it to about 0.72x) only when someone asks for it, for projecting say.
+- **Document** (a report or review too long for a chat): an ordinary document. `@page { size: A4; margin: 0 }` (`letter` for a US reader) with the margin as body padding (`20mm`, `box-decoration-break: clone`) so the background fills each page, one column, body 10.5 to 11pt, headings 14 to 18pt, ordinary tables with `break-inside: avoid` on short ones, images `max-width: 100%`. Headings, paragraphs and lists; no cover slide, no stat tiles.
+- **Page** (a one-page explainer): the same A4 or Letter portrait page, one page, the same type sizes, the visual shape from the Page form below.
+- **Deck:** landscape 16:9, PowerPoint's widescreen, one slide per page. `@page { size: 254mm 142.9mm; margin: 0 }`, each slide exactly that size with `break-after: page`. Body at least 18pt, headlines at least 28pt. Use the traditional layouts: title, title and content, two content, picture or diagram with caption, section header. A slide that won't fit at those sizes is over budget; split it. Vertical (`size: 108mm 192mm`, body at least 12pt, headlines at least 22pt) only when someone asks for it.
 - **Colour:** `print-color-adjust: exact` on `html`, or the background drops out.
 
-Before sending, check it: `pdfinfo out.pdf` for pages and size (306 x 544 pts, or 544 x 306 for a landscape deck), and `pdftoppm -r 52 -png out.pdf p` gives each page at about phone width (393px); look at them. Text cut off, a column squeezed, or anything you'd zoom to read is not done.
+Before sending, check it: `pdfinfo out.pdf` for pages and size (595 x 842 pts for A4, 612 x 792 for Letter, 720 x 405 for a deck), and `pdftoppm -r 100 -png out.pdf p` gives each page at a readable screen size; look at them. Text cut off, a column squeezed, or a slide that is a wall of text is not done.
 
 Other formats, only when asked:
 
@@ -87,7 +92,7 @@ If the user wants the deck narrated, write speaker notes for the ear (below) and
 
 The page succeeds when a smart newcomer gets the idea faster from it than from a paragraph: a taught explanation, not the same prose in a nicer font. Start from what the reader knows (for a cold reader, the question the page answers), give a concrete example before the abstraction, and rank what matters instead of presenting five things as equal. Section headers read as an outline, and the page ends where the reader can act. Cut any section that neither teaches nor guides.
 
-Lead with the shape of the idea: a process gets a numbered path or flow, a system a labelled diagram of parts, a comparison side-by-side columns with differences marked, a decision the question, options and the recommendation, events a timeline, one hard concept an analogy and then the mechanism, numbers a few stat tiles or one chart. Light throughout, and it prints the way it screens: the PDF is the same file at a phone-shaped page size.
+Lead with the shape of the idea: a process gets a numbered path or flow, a system a labelled diagram of parts, a comparison side-by-side columns with differences marked, a decision the question, options and the recommendation, events a timeline, one hard concept an analogy and then the mechanism, numbers a few stat tiles or one chart. Light throughout, and it prints the way it screens: the PDF is the same file on one A4 or Letter page.
 
 ## Brief
 

@@ -7,4 +7,4 @@ For appearance, not prose; run the de-slop skill for wording. The project's visu
 
 Black ink on warm cream, Lora serif headings over a quiet sans body with small mono labels, structure from hairlines and whitespace instead of boxes, square corners, no shadows or gradients, and one red used like an architect's red pen on the single thing that matters.
 
-The look holds in print and on a phone-width PDF: one column, the cream background printed (`print-color-adjust: exact`), and the type sizes the present skill sets for a phone.
+The look holds in print, on a landscape slide and on an ordinary A4 or Letter page: the cream background printed (`print-color-adjust: exact`), and the type sizes the present skill sets.

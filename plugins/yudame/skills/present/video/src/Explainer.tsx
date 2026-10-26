@@ -34,7 +34,7 @@ const SceneView = ({scene, index}: {scene: Scene; index: number}) => {
       <h1
         style={{
           fontFamily: serif,
-          fontSize: 88,
+          fontSize: 92,
           lineHeight: 1.1,
           margin: 0,
           opacity: enter,
@@ -49,7 +49,7 @@ const SceneView = ({scene, index}: {scene: Scene; index: number}) => {
           const at = LEAD_IN + Math.round(((i + 1) * narration) / ((scene.points?.length ?? 0) + 1));
           const o = interpolate(frame, [at, at + 12], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
           return (
-            <li key={p} style={{fontSize: 50, lineHeight: 1.3, margin: '0 0 40px', opacity: o, display: 'flex', gap: 28}}>
+            <li key={p} style={{fontSize: 48, margin: '0 0 28px', opacity: o, display: 'flex', gap: 28}}>
               <span style={{color: i === 0 ? RED : INK}}>—</span>
               {p}
             </li>
