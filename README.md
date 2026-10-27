@@ -57,6 +57,19 @@ It links each `plugins/*/skills/<name>` into `~/.agents/skills/<name>`, pointing
 
 Pi has no subagents, so the skills that fan out (`do-build`, `do-sdlc`, the critics and reviewers) run their steps in sequence there; each skill says how. Pi also reads `~/.pi/agent/skills`, but `~/.agents/skills` covers it.
 
+### Google sign-in for `gws`
+
+`email` and `calendar` use `gws`, Google's Workspace CLI. At Yudame it signs in through the Yudame Workspace OAuth client, which only yuda.me accounts can use. Once per machine:
+
+```
+npm install -g @googleworkspace/cli
+mkdir -p ~/.config/gws
+op read --out-file ~/.config/gws/client_secret.json 'op://Yudame Secrets/Google Oauth Client Valor Desktop Client/client_secret_json'
+gws auth login --scopes https://www.googleapis.com/auth/gmail.modify,https://www.googleapis.com/auth/calendar,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/documents,https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/presentations,https://www.googleapis.com/auth/tasks,https://www.googleapis.com/auth/contacts,https://www.googleapis.com/auth/chat.messages,https://www.googleapis.com/auth/chat.spaces,https://www.googleapis.com/auth/forms.body,https://www.googleapis.com/auth/forms.responses.readonly,https://www.googleapis.com/auth/meetings.space.created,https://www.googleapis.com/auth/meetings.space.readonly,openid,https://www.googleapis.com/auth/userinfo.email
+```
+
+Approve it in the browser as your yuda.me account. Never `--full` or the default scopes: they add Cloud scopes, and Yudame's Cloud session control then asks for the sign-in again. Outside Yudame, `gws auth setup` makes your own client.
+
 ## Who "the user" is
 
 Skills are written for whoever is in the conversation: "the user" gets the questions, drafts and approvals. A skill never names the person who wrote it. An autonomous deployment can sit behind the same skills: where a skill asks the user a question or waits for a checkpoint, that deployment answers through its own channel. A repo can change a skill's behavior by shipping a context file the skill probes for (for example `.claude/skill-context/<skill>.md` or `docs/sdlc/<skill>.md`), and no file means the generic behavior in the skill.
