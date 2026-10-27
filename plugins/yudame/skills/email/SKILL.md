@@ -14,7 +14,7 @@ Goal: get the mail task done with the lightest tool that can reach the mailbox, 
 Use the first of these that is present and authenticated. A tool that is installed but fails auth counts as absent: move on rather than stall on it.
 
 1. **A repo-provided mail CLI**, if the current repo's AGENTS.md or CLAUDE.md documents one.
-2. **`gws gmail`** (Google's Workspace CLI, `npm install -g @googleworkspace/cli`). It needs a one-time human `gws auth setup` / `gws auth login`, so an auth error means fall through, not retry.
+2. **`gws gmail`** (Google's Workspace CLI, `npm install -g @googleworkspace/cli`). It needs a one-time human sign-in (this repo's README, "Google sign-in for `gws`"), so an auth error means fall through, not retry.
    ```bash
    gws gmail users messages list --params '{"userId": "me", "q": "from:a@b.com is:unread", "maxResults": 5}'
    gws gmail users messages get  --params '{"userId": "me", "id": "MSG_ID"}'

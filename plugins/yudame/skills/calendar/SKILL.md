@@ -9,7 +9,7 @@ Goal: answer calendar questions and make calendar changes accurately, from the r
 
 ## The tool
 
-**`gws calendar`** (Google's Workspace CLI, `npm install -g @googleworkspace/cli`). It needs a one-time human `gws auth login`, so an auth error means stop and tell the user to log in again, not retry.
+**`gws calendar`** (Google's Workspace CLI, `npm install -g @googleworkspace/cli`). It needs a one-time human sign-in (this repo's README, "Google sign-in for `gws`"), so an auth error means stop and tell the user to sign in again that way, not retry.
 
 **Whose calendar.** `gws` acts as the Google account it is logged in as, which may not be the person in the conversation. Before reading or changing anything, check which account that is; the `id` of the primary calendar is its address:
 
