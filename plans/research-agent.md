@@ -15,6 +15,18 @@ Cuttlefish's master briefing, every claim sourced with a confidence, a short sum
 top so the caller can act without reading all of it, and an A4/Letter PDF when it goes
 to a person.
 
+Steering (Tom, 2026-11-01 12:36 UTC), the first real question and two additions:
+"a critical review and redesign of what it would be the best prioritization system for
+our product persona and product table that lives in Google sheets. I made references to
+books and concepts that were important to me and those should be looked at more deeply
+and also identify and work in other latest best practices of product owners that I
+didn't consider. We expect those deep research tasks to take 25-45 minutes to complete
+end to end. And if using the Cuttlefish infra, it can even be published on the Yudame
+Research Podcast." So: a run is sized for 25-45 minutes; the caller's document (here a
+Google Sheet and the role it serves) goes in as context; and drafting a Yudame Research
+Podcast episode from the report is an option, prepared but never published until Tom
+has read the report.
+
 The GitHub issue step of the pipeline is this file: this task can push a branch but not
 open issues, and the repository is public, so the plan carries the request in plain
 terms.
@@ -95,21 +107,57 @@ logic of its own; every step is a Cuttlefish function.
      `together_prompt`). No prompt text lives here. If Perplexity is unavailable, the
      targeted prompts are crafted with an empty question discovery.
   2. The five tools in parallel threads, each with Cuttlefish's own timeout parameters
-     passed explicitly, not wrapped: Gemini `poll_interval=60, max_attempts=25`
-     (25 min), Perplexity `timeout=600`, Grok `timeout=300`, the rest their defaults.
+     passed explicitly, not wrapped: Gemini `poll_interval=60, max_attempts=30`
+     (30 min), Perplexity `timeout=600, max_retries=2` (its sync call retries a
+     timeout, so up to 20 min; Cuttlefish's default 3 allows 30, too long ahead of
+     the targeted round for Tom's 25-45 minute run), Grok `timeout=300`, the rest their defaults.
      A tool that errors, returns nothing, or times out is recorded as skipped with the
-     reason (`timed out after 25 min`, the error line) in the method section; the
+     reason (`no result within 30 min`, the error line) in the method section; the
      others carry on.
-  3. `digest_research` per result, `cross_validate` across them,
-     `_select_load_bearing_weak_claims` + `refute_claims`, then `write_briefing` with a
-     style guide that sets the reader as a decision-maker rather than a podcast
-     audience (the function's own `style_guide` hook, no prompt copied).
+  3. Each result goes through Cuttlefish's own per-tool cleanup, as its
+     `services/research.py` wrappers do: `safety.filter_research_output(text,
+     source=<tool>)` then `research._guard_content_length(text, <label>)` (a result
+     under 500 characters becomes a skipped tool with that reason). Its request
+     screen (`check_research_request`) is not called: it is a refusal, and adding a
+     refusal here is governance with no grant.
+  4. The analysis, all from the per-step pure modules (`services/<name>.py`), never
+     the `episode_id` wrappers of the same names in `services/analysis.py`, which
+     need the database. In the wrappers' order and with their arguments:
+     - `digest_research(text, question)` per result, formatted with
+       `analysis._format_research_digest` (the text the wrapper stores).
+     - `classify_question_resolution(question_discovery=<QuestionDiscovery
+       .model_dump()>, research_texts, question)`, its unresolved and partially
+       addressed lists formatted as the wrapper does (`## Unresolved Questions`,
+       `## Partially Addressed Questions`) into `question_gaps`. Skipped with no
+       question discovery.
+     - `source_tier.build_source_tiers(<one SimpleNamespace(title, metadata) per
+       source>, key_fn=lambda s: s.title)`: the tools' metadata carries no tier, as
+       in Cuttlefish, so they are GENERIC; the caller's `--context` file, when given,
+       enters the corpus as source `caller-context` with
+       `credibility_tier: "ground_truth"`, as Cuttlefish treats a subscriber's own
+       material. No tiering logic is copied.
+     - `cross_validate(research_texts, question, question_gaps=question_gaps,
+       source_tiers=tiers)`.
+     - `refute_claims._select_load_bearing_weak_claims(cv.model_dump())` (a dict), and
+       when it selects anything, `refute_claims(selected, research_texts, question,
+       source_tiers=tiers)` inside a catch-all that records the rebuttal as skipped
+       with the error, and dispositions outside refuted/weakened/survives coerced to
+       survives, as the wrapper does.
+     - `write_briefing(cross_validation=analysis._format_cross_validation(cv),
+       research_digests, episode_title=question, question_gaps=question_gaps,
+       style_guide=<decision-maker reader>, refutation_dispositions=<only refuted and
+       weakened entries, each {claim, disposition, contradicting_evidence}>)`, so a
+       refuted claim changes the findings instead of standing in them.
 - **Runs detached.** The outer command starts the inner run in the background with
   its output going to `run.log`, writes `status.json` (`{"state": "running" |
   "done" | "failed", "step": "<current step>", "started": ..., "report": <path>,
   "error": <line>}`) and returns at once with the run directory. The inner run
-  updates `status.json` at each step. A full run takes 10-35 minutes, longer than
+  updates `status.json` at each step. A full run takes 25-45 minutes, longer than
   one shell call may last, so nothing waits on it in one call.
+- **Leaves the caller's session settings behind.** The inner run drops
+  `ANTHROPIC_BASE_URL`: a calling agent's session may point it at a local proxy with
+  its own rate limit (found in build: the first real run failed on a 429 from it),
+  and Cuttlefish calls the Anthropic API itself.
 - **Writes** `report.md` and `raw.json` (every tool's text, meta and the structured
   outputs) to `--out` (default `./research/<YYYY-MM-DD>-<slug>/`), and prints the
   report path and the summary.
@@ -120,8 +168,9 @@ The rendering is the only code that is ours: structured Cuttlefish output to mar
 
 ### 2. Report shape (`report.md`)
 
-1. **Summary**: the answer in a few sentences, then the 3-7 claims that carry it,
-   each with its confidence and source links. Enough to act on.
+1. **Summary**: the cross-validation's own summary, then up to 7 claims that carry
+   it (confirmed claims, highest confidence first, refuted ones left out), each with
+   its confidence and sources. Enough to act on. No model call of ours writes it.
 2. **Findings by topic**: from the master briefing, each finding with its evidence,
    source, study quality and sample size.
 3. **Every claim**: confirmed by several sources, single-source, and contested (each
@@ -145,7 +194,7 @@ that needs depth, several sources, and a confidence per claim; quick lookups go 
 web agent), `tools: Bash, Read, Write`. Body: start the runner with the question (it
 returns at once with the run directory), then check `status.json` every couple of
 minutes with a short sleep in each call (each call well under the shell's per-call
-limit) until `done` or `failed`, for up to 45 minutes. On `done`, read `report.md`,
+limit) until `done` or `failed`, for up to 60 minutes. On `done`, read `report.md`,
 check every summary claim appears with a source in the body, and return the summary,
 the report path, and what was skipped. It never pastes the full report back. On
 `failed` or no Cuttlefish access, it returns the error line and does not research by
@@ -162,7 +211,18 @@ report contains; when it goes to a person, print it as an A4/Letter PDF by the p
 skill's print recipe, run the de-slop skill first; setup (Cuttlefish access, `uv`,
 `op`, the six keys). `keys.env` lists the six `op://` references.
 
-### 5. README
+### 5. The podcast option: `run.py episode RUN_DIR [--podcast yudame-research]`
+
+Drafts an episode with Cuttlefish's own operator commands, `manage.py episode create
+--podcast-slug <podcast> --title <title> --defer-setup --json` then `episode attach
+<slug> --file report.md --require --json`, and writes `episode.json`. It never runs
+`setup` or `publish`: setting up, producing and publishing wait for a person who has
+read the report. It needs `CUTTLEFISH_DIR` pointing at a checkout configured for
+production; without it, it says so and stops. For the first run the episode is
+prepared, not created: creating a row in Cuttlefish's production database is an effect
+this task cannot request, so the delivery names the command.
+
+### 6. README
 
 The `yudame` row's "Needs" names the research skill's needs (read access to Cuttlefish,
 `uv`, the keys); "What's here" lists `research` and the `researcher` agent.
@@ -195,9 +255,12 @@ Critique rounds: 1. Review rounds: 1.
 
 ## Tech debt
 
-- `_select_load_bearing_weak_claims` is private in Cuttlefish; calling it pays the debt
-  of re-implementing claim selection here, and costs a break if Cuttlefish renames it
-  (named in the error).
+- Five private Cuttlefish names are called: `_select_load_bearing_weak_claims`,
+  `_guard_content_length`, `_format_cross_validation`, `_format_research_digest`,
+  `_format_question_discovery`.
+  Calling them pays the debt of re-implementing claim selection, the truncation rule
+  and the formats here; a rename in Cuttlefish fails the run with the import error
+  named.
 - The managed clone in `~/.cache` pays the debt of touching a developer's working
   checkout; it costs one extra clone per machine.
 
@@ -226,12 +289,23 @@ Critique rounds: 1. Review rounds: 1.
 - Detached run: the outer command returns within seconds while a fake inner run
   sleeps, `status.json` reads `running` then `done` with the report path; a fake
   inner run that raises leaves `failed` with the error line.
+- Cuttlefish's glue, with fake functions: `write_briefing` receives
+  `refutation_dispositions` holding only refuted and weakened entries;
+  `cross_validate` and `refute_claims` receive `source_tiers` (with `caller-context`
+  as ground truth when context is given); `cross_validate` and `write_briefing`
+  receive the same `question_gaps`; `_select_load_bearing_weak_claims` is given a
+  dict; a failing `refute_claims` leaves the run going with the rebuttal recorded as
+  skipped.
 - Cuttlefish location: `$CUTTLEFISH_DIR` wins; otherwise the managed path; the runner
   never runs `git pull` in a directory it did not clone.
+- Episode: with fake commands, `create --defer-setup` then `attach --require` with the
+  report on the named podcast, nothing else (no setup, no publish); no report or no
+  `CUTTLEFISH_DIR` stops with the reason.
 - `tests/check_skills.py` passes with the new skill; the agent file has `name`,
   `description`, `tools`.
 
-End to end, in build: one real question (one useful to Yudame, not about any client),
+End to end, in build: Tom's question above, with the product-owner role and the Sheet's
+columns and scoring formulas as context (no backlog rows, which are client work),
 all six tools, started by the researcher agent and polled to completion (a real run
 of over 10 minutes is expected with Gemini; its wall time is in the method section),
 the report and its PDF kept in the task workspace for the delivery, not

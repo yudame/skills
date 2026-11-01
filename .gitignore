@@ -3,3 +3,6 @@ plugins/yudame-dev/skills/audit-skills/references/metadata.json
 node_modules/
 .DS_Store
 __pycache__/
+
+# research runs (run.py output)
+/research/
