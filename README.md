@@ -4,7 +4,7 @@ Agent skills from Yudame, as two plugins in one marketplace. They follow the [Ag
 
 | Plugin | For | Needs |
 |---|---|---|
-| `yudame` | Everyone | Nothing beyond the agent; `officecli` and `calendar` need the `officecli` and `gws` command-line tools; `research` needs read access to `yudame/cuttlefish`, `uv`, and the research keys (its SKILL.md) |
+| `yudame` | Everyone | Nothing beyond the agent; `officecli` and `calendar` need the `officecli` and `gws` command-line tools; `research` works best with an `OPENROUTER_API_KEY` |
 | `yudame-dev` | Developers | git, and GitHub for the pipeline skills |
 
 Invoke a skill as `/yudame:present` in Claude Code, as `$present` in Codex, or as `/skill:present` in Pi. Inside a skill, other skills are named in plain words ("run the de-slop skill"), so each harness resolves them its own way.
@@ -16,7 +16,7 @@ Why these skills exist, in principles: [MANIFESTO.md](MANIFESTO.md).
 **`yudame`**
 - Presenting: `present` (deck, page, spoken brief, narrated video; voice via `tts.py`, video via a Remotion template), `house-style` (the fallback look), `de-slop` (the editorial gate), `email`.
 - Office and calendar: `officecli` (Word, Excel and PowerPoint files), `calendar` (Google Calendar through `gws`).
-- Research: `research` (deep research on one question with Cuttlefish's six research tools, cross-checked into a long report with a confidence on every claim) and the `researcher` agent that runs it, so the caller never handles the tools.
+- Research: `research` (how to think a question through to a long report: sub-questions, several independent models with web search, every claim cross-checked and rebutted, a confidence on each; works with only an OpenRouter key) and the `researcher` agent that runs it.
 
 **`yudame-dev`**
 - Work pipeline: `do-issue`, `do-plan`, `do-plan-critique`, `do-build`, `do-test`, `do-patch`, `do-pr-review`, `do-docs`, `do-merge`, with `do-sdlc` to run them in order, and `do-investigation-issue` for unconfirmed findings.
@@ -83,7 +83,7 @@ The plugins have no `version`, so each commit on `main` is a new version. `claud
 
 `plugins/<plugin>/skills/<name>/SKILL.md`, plus any files the skill reads. Adding a directory there adds the skill. Subagents live in `plugins/<plugin>/agents/<name>.md` (Claude Code only); `researcher` is the one there today. `yudame` is self-contained. `do-design-audit` in `yudame-dev` falls back to the `house-style` skill, so developers should install both. `audit-hooks` and `cowork` are about Claude Code itself and say so in `compatibility`.
 
-`python3 tests/check_skills.py` checks that every skill loads in all three harnesses; `sh tests/check_install.sh` checks the installer; `python3 tests/check_tts.py` checks that the present skill's `tts.py` says the names in its lexicon as listed; `python3 tests/check_research.py` checks that the research skill's `run.py` calls Cuttlefish's research functions in order and renders the report, with no network or keys.
+`python3 tests/check_skills.py` checks that every skill loads in all three harnesses; `sh tests/check_install.sh` checks the installer; `python3 tests/check_tts.py` checks that the present skill's `tts.py` says the names in its lexicon as listed; `python3 tests/check_ask.py` checks the research skill's optional `ask.py` OpenRouter helper, with no network or key.
 
 ## Origin
 
