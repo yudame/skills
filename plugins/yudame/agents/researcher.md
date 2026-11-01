@@ -11,7 +11,7 @@ The runner is `run.py` in the research skill's directory. The caller names that 
 1. Put any material the caller gave you (a document, a sheet's contents, notes) in a file, as plain text or markdown. Then start the run, which returns at once with its directory:
 
    ```
-   python3 <skill dir>/run.py "<the question, as the caller framed it>" [--context FILE] [--out DIR]
+   python3 <skill dir>/run.py "<the question, as the caller framed it>" [--context FILE] [--title TEXT] [--out DIR]
    ```
 
 2. Poll `<dir>/status.json` until `state` is `done` or `failed`: one short call at a time (`sleep 120; cat <dir>/status.json`), never one long call. Allow 60 minutes. `step` says where it is.

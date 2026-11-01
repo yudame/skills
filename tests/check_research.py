@@ -257,6 +257,10 @@ def long_question_gets_a_short_title():
     lines = run.render(result).splitlines()
     assert lines[0] == "# Review the system" and lines[2] == "**Question.** Review the system. Then go deeper on each book."
     assert run.render(run.research("Is X true?", "", fake_cuttlefish({}), ALL_KEYS)).splitlines()[:2] == ["# Is X true?", ""]
+    titled = dict(result, title="A short title")
+    assert run.render(titled).splitlines()[0] == "# A short title"
+    long = run.render(run.research("word " * 40 + "end", "", fake_cuttlefish({}), ALL_KEYS)).splitlines()[0]
+    assert len(long) <= 105 and long.endswith("word...") , long
 
 
 @check
@@ -264,8 +268,9 @@ def tool_without_cost_is_named_uncounted():
     calls = {}
     cf = fake_cuttlefish(calls)
     cf.tools["gemini"] = lambda **kw: (TEXT, {})
+    cf.tools["perplexity"] = lambda **kw: (TEXT, {"cost": {"total": 0.0}})
     report = run.render(run.research("Q?", "", cf, ALL_KEYS))
-    assert "(uncounted: Gemini report no cost)" in report
+    assert "(uncounted: Perplexity, Gemini report no cost)" in report, "a zero total is a missed reading, not free"
     assert "| Gemini | returned | 0m 0s | not reported |" in report
 
 

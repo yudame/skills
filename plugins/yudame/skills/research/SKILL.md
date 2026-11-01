@@ -19,7 +19,7 @@ Goal: a question that deserves depth comes back as a full report the caller can 
 Where the harness has subagents, start the researcher agent with the question, any material for context, and this skill's directory; it returns the summary and the report's path. Otherwise (Codex, Pi) do what it does:
 
 1. Put the caller's material in a file (a Google Sheet read with `gws sheets`, a document as text, notes). It is treated as ground truth: a claim it contradicts resolves toward it.
-2. `python3 <this skill's dir>/run.py "<question>" --context FILE` returns at once with the run directory. Frame the question to say what to dig into: each book or idea the material relies on, and what it leaves out.
+2. `python3 <this skill's dir>/run.py "<question>" --context FILE --title "<short title>"` returns at once with the run directory. Frame the question to say what to dig into: each book or idea the material relies on, and what it leaves out.
 3. Check `<dir>/status.json` in short calls (`sleep 120; cat ...`) until `done` or `failed`; never one long call. On `failed`, its `error` says why: fall back to quick research and say the deep run failed.
 4. Read `<dir>/report.md`.
 
@@ -31,7 +31,7 @@ The runner calls Cuttlefish's own research code from a Cuttlefish checkout it ke
 
 Confidence is Cuttlefish's: high when 3+ independent sources agree, medium for 2 or one strong study, low for one source.
 
-When it goes to a person, it is a document: run the de-slop skill on it, then print it as an A4 or Letter PDF by the present skill's PDF recipe (Document form). To make the HTML, `pandoc report.md -f markdown+lists_without_preceding_blankline -s -c print.css --embed-resources -o report.html`: the flag keeps lists that follow a line directly as lists. In a chat, give the summary and send the PDF.
+When it goes to a person, it is a document: run the de-slop skill on it first when the reader is outside Yudame, then print it as an A4 or Letter PDF by the present skill's PDF recipe (Document form). To make the HTML, `pandoc report.md -f markdown+lists_without_preceding_blankline -s -c print.css --embed-resources -o report.html`: the flag keeps lists that follow a line directly as lists. In a chat, give the summary and send the PDF.
 
 ## A podcast episode
 

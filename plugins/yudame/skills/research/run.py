@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Deep research on one question with Cuttlefish's tools, written up as a long report.
 
-    run.py "<question>" [--context FILE] [--out DIR]
+    run.py "<question>" [--context FILE] [--title TEXT] [--out DIR]
     run.py episode RUN_DIR [--podcast SLUG] [--title TEXT]
 
 Returns at once with the run directory; the work goes on in the background and
@@ -70,11 +70,12 @@ def slug(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:60] or "research"
 
 
-def start(question: str, context: str, out: str | None) -> Path:
+def start(question: str, context: str, out: str | None, title: str = "") -> Path:
     run_dir = Path(out or f"research/{datetime.date.today()}-{slug(question)}").resolve()
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "question.txt").write_text(question)
     (run_dir / "context.txt").write_text(context)
+    (run_dir / "title.txt").write_text(title)
     write_status(run_dir, state="running", step="starting", started=now(), report=None, error=None)
     with open(run_dir / "run.log", "ab") as log:
         subprocess.Popen(
@@ -239,7 +240,8 @@ def research(question: str, context: str, cf, env: dict, step=lambda s: None) ->
         if text and reader:
             meta = {**meta, **reader(meta)}
         entry["seconds"] = round(time.time() - began)
-        entry["cost"] = (meta.get("cost") or {}).get("total")
+        # A run is never free: a zero total means the tool's own reader missed its usage.
+        entry["cost"] = (meta.get("cost") or {}).get("total") or None
         entry["citations"] = citations(meta)
         if text:
             text = cf.guard_length(cf.filter_output(text, source=name), source_label=label)
@@ -400,8 +402,10 @@ def render(result: dict) -> str:
     outcome = {d["claim"]: d for d in result["refutation"].get("dispositions", [])}
     ran = [t for t in tools.values() if t["state"] == "ran"]
     question = result["question"].strip()
-    title = question.split(". ")[0].rstrip(".")
-    L = [f"# {title if len(title) <= 160 else title[:157] + '...'}", ""]
+    title = result.get("title") or question.split(". ")[0].rstrip(".")
+    if len(title) > 100:
+        title = title[:100].rsplit(" ", 1)[0] + "..."
+    L = [f"# {title}", ""]
     if title != question.rstrip("."):
         L += [f"**Question.** {question}", ""]
     L.append(f"Deep research report, {result['started'][:10]}. {len(ran)} of {len(tools)} research tools returned; "
@@ -510,6 +514,8 @@ def inner(run_dir: Path) -> int:
     try:
         cf = load_cuttlefish()
         result = research(question, context, cf, dict(os.environ), step=lambda s: write_status(run_dir, step=s))
+        title = run_dir / "title.txt"
+        result["title"] = title.read_text().strip() if title.exists() else ""
         (run_dir / "raw.json").write_text(json.dumps(result, indent=2, default=str))
         (run_dir / "report.md").write_text(render(result))
         write_status(run_dir, state="done", step="done", report=str(run_dir / "report.md"), finished=now())
@@ -568,8 +574,9 @@ def main(argv: list[str]) -> int:
     p.add_argument("question")
     p.add_argument("--context", type=Path, help="a file of the caller's own material, treated as ground truth")
     p.add_argument("--out", help="run directory (default research/<date>-<question>)")
+    p.add_argument("--title", default="", help="the report's title (default the question's first sentence)")
     args = p.parse_args(argv)
-    run_dir = start(args.question, args.context.read_text() if args.context else "", args.out)
+    run_dir = start(args.question, args.context.read_text() if args.context else "", args.out, args.title)
     print(run_dir)
     return 0
 
