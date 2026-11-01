@@ -76,7 +76,9 @@ Checked on this Mac: a fresh clone, `uv sync`, then `django.setup()` with
 `DJANGO_SETTINGS_MODULE=settings` and no other environment imports all of the above
 cleanly, with no database. All six keys are in 1Password vault `m-valor` and each
 authenticated on 2026-11-01 (`credential` field; Grok is item `Grok x.ai API Key`,
-field `API_KEY`). Nothing to ask Tom for.
+field `API_KEY`). Nothing to ask Tom for. Found in build: the item `GEMINI_API_KEY` is a
+free-tier key that Gemini deep research refuses (429, limit 0); the item
+`GOOGLE_API_KEY` is paid and was accepted, so `keys.env` points Gemini at it.
 
 ## What gets built
 
@@ -106,7 +108,9 @@ logic of its own; every step is a Cuttlefish function.
      Claude `claude_prompt`, Grok `grok_prompt`, Gemini `gemini_prompt`, OpenRouter
      `together_prompt`). No prompt text lives here. If Perplexity is unavailable, the
      targeted prompts are crafted with an empty question discovery.
-  2. The five tools in parallel threads, each with Cuttlefish's own timeout parameters
+  2. Each tool's response read with that tool module's own `extract_metadata` where it
+     has one (cost and citations), as `services/research.py` does.
+  3. The five tools in parallel threads, each with Cuttlefish's own timeout parameters
      passed explicitly, not wrapped: Gemini `poll_interval=60, max_attempts=30`
      (30 min), Perplexity `timeout=600, max_retries=2` (its sync call retries a
      timeout, so up to 20 min; Cuttlefish's default 3 allows 30, too long ahead of

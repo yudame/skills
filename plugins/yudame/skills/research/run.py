@@ -399,7 +399,11 @@ def render(result: dict) -> str:
     cv, mb, tools = result["cross_validation"], result["briefing"], result["tools"]
     outcome = {d["claim"]: d for d in result["refutation"].get("dispositions", [])}
     ran = [t for t in tools.values() if t["state"] == "ran"]
-    L = [f"# {result['question']}", ""]
+    question = result["question"].strip()
+    title = question.split(". ")[0].rstrip(".")
+    L = [f"# {title if len(title) <= 160 else title[:157] + '...'}", ""]
+    if title != question.rstrip("."):
+        L += [f"**Question.** {question}", ""]
     L.append(f"Deep research report, {result['started'][:10]}. {len(ran)} of {len(tools)} research tools returned; "
              f"every claim below carries its sources and a confidence (high: 3+ sources agree, medium: 2, or 1 strong study; low: 1).")
     L.append("")

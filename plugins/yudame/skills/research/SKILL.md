@@ -31,7 +31,7 @@ The runner calls Cuttlefish's own research code from a Cuttlefish checkout it ke
 
 Confidence is Cuttlefish's: high when 3+ independent sources agree, medium for 2 or one strong study, low for one source.
 
-When it goes to a person, it is a document: run the de-slop skill on it, then print it as an A4 or Letter PDF by the present skill's PDF recipe (Document form). In a chat, give the summary and send the PDF.
+When it goes to a person, it is a document: run the de-slop skill on it, then print it as an A4 or Letter PDF by the present skill's PDF recipe (Document form). To make the HTML, `pandoc report.md -f markdown+lists_without_preceding_blankline -s -c print.css --embed-resources -o report.html`: the flag keeps lists that follow a line directly as lists. In a chat, give the summary and send the PDF.
 
 ## A podcast episode
 

@@ -251,6 +251,15 @@ def tool_cost_comes_from_its_own_metadata_reader():
 
 
 @check
+def long_question_gets_a_short_title():
+    calls = {}
+    result = run.research("Review the system. Then go deeper on each book.", "", fake_cuttlefish(calls), ALL_KEYS)
+    lines = run.render(result).splitlines()
+    assert lines[0] == "# Review the system" and lines[2] == "**Question.** Review the system. Then go deeper on each book."
+    assert run.render(run.research("Is X true?", "", fake_cuttlefish({}), ALL_KEYS)).splitlines()[:2] == ["# Is X true?", ""]
+
+
+@check
 def tool_without_cost_is_named_uncounted():
     calls = {}
     cf = fake_cuttlefish(calls)
