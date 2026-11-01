@@ -46,7 +46,7 @@ CV = Model(
     ],
     single_source_claims=[
         Model(claim="C holds", sources=["grok"], confidence="high"),
-        Model(claim="D holds", sources=["together"], confidence="low"),
+        Model(claim="D holds", sources=["Together", "caller-context"], confidence="low"),
     ],
     conflicting_claims=[
         Model(topic="E or not E", positions=[Model(source="gemini", position="E"), Model(source="chatgpt", position="not E")], resolution_suggestion="look again"),
@@ -228,6 +228,7 @@ def report_shape_and_costs():
         assert claim in report[report.index("## Every claim"):], claim
     assert "C holds (confidence: **high**; sources: [Grok](#grok)) — rebuttal: **refuted**" in report
     assert "[Gemini](#gemini): E" in report and "Rebuttal: **weakened**" in report
+    assert "D holds (confidence: **low**; sources: [OpenRouter Llama](#openrouter-llama), your context)" in report, "source names match whatever their case"
     assert "Smith 2024; RCT, n=120" in report
     assert "Unanswered: u1" in report and "**Topic two** (shallow)" in report
     assert "https://example.org/grok" in report
@@ -236,6 +237,17 @@ def report_shape_and_costs():
     assert "- Research tools: $3.00" in report
     assert f"- Analysis steps (prompts, digests, cross-check, rebuttal, briefing): ${0.1 * analysis_calls:,.2f}" in report
     assert f"- Total: ${3 + 0.1 * analysis_calls:,.2f}" in report and "uncounted" not in report
+
+
+@check
+def tool_cost_comes_from_its_own_metadata_reader():
+    calls = {}
+    cf = fake_cuttlefish(calls)
+    cf.tools["claude"] = lambda **kw: (TEXT, {"usage": {"tokens": 10}})
+    cf.tool_meta = {"claude": lambda response: {"cost": {"total": response["usage"]["tokens"] / 10}, "citations": [{"url": "https://example.org/c", "title": "C"}]}}
+    result = run.research("Q?", "", cf, ALL_KEYS)
+    assert result["tools"]["claude"]["cost"] == 1.0
+    assert result["tools"]["claude"]["citations"] == [{"url": "https://example.org/c", "title": "C"}]
 
 
 @check
@@ -264,7 +276,7 @@ def key_resolution():
     assert set(refs) == {t[2] for t in run.TOOLS}
     assert all(r.startswith("op://") for r in refs.values()), "keys.env holds references only"
     read = {}
-    got = run.resolve_keys({"OPENAI_API_KEY": "env"}, refs, read=lambda ref: read.setdefault(ref, "op") if "GEMINI" not in ref else None)
+    got = run.resolve_keys({"OPENAI_API_KEY": "env"}, refs, read=lambda ref: read.setdefault(ref, "op") if ref != refs["GEMINI_API_KEY"] else None)
     assert "OPENAI_API_KEY" not in got and not any("OPENAI" in r for r in read), "environment wins"
     assert "GEMINI_API_KEY" not in got and got["PERPLEXITY_API_KEY"] == "op"
 

@@ -178,11 +178,15 @@ def load_cuttlefish() -> SimpleNamespace:
     from apps.podcast.services.refute_claims import _select_load_bearing_weak_claims, refute_claims
     from apps.podcast.services.write_briefing import write_briefing
 
-    tools = {}
+    tools, tool_meta = {}, {}
     for name, _label, _key, module, _field, _kw in TOOLS:
-        tools[name] = getattr(importlib.import_module(f"apps.podcast.tools.{module}"), f"run_{module.removesuffix('_deep_research')}_research")
+        mod = importlib.import_module(f"apps.podcast.tools.{module}")
+        tools[name] = getattr(mod, f"run_{module.removesuffix('_deep_research')}_research")
+        # Each tool's own reading of its response (cost, citations), where it has one.
+        tool_meta[name] = getattr(mod, "extract_metadata", None)
     return SimpleNamespace(
         tools=tools,
+        tool_meta=tool_meta,
         craft_research_prompt=craft_research_prompt,
         craft_targeted_prompts=craft_targeted_prompts,
         digest_research=digest_research,
@@ -231,6 +235,9 @@ def research(question: str, context: str, cf, env: dict, step=lambda s: None) ->
         except Exception as exc:  # noqa: BLE001 - one tool failing leaves the others running
             text, meta, entry["reason"] = None, {}, f"error: {type(exc).__name__}: {exc}"[:300]
         meta = meta or {}
+        reader = getattr(cf, "tool_meta", {}).get(name)
+        if text and reader:
+            meta = {**meta, **reader(meta)}
         entry["seconds"] = round(time.time() - began)
         entry["cost"] = (meta.get("cost") or {}).get("total")
         entry["citations"] = citations(meta)
@@ -382,8 +389,9 @@ def money(x: float | None) -> str:
 def source_names(names: list[str], result: dict) -> str:
     out = []
     for n in names:
-        label = LABEL.get(n) or ("your context" if n == CONTEXT_SOURCE else n)
-        out.append(f"[{label}](#{slug(label)})" if n in result["tools"] else label)
+        key = n.strip().lower()
+        label = LABEL.get(key) or ("your context" if key == CONTEXT_SOURCE else n)
+        out.append(f"[{label}](#{slug(label)})" if key in result["tools"] else label)
     return ", ".join(out) or "none named"
 
 
