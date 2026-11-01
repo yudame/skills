@@ -71,7 +71,12 @@ def main() -> int:
         code = ask.main(["m", "q"])
     check("no key: exit 2 with the reason", code == 2 and "OPENROUTER_API_KEY" in err.getvalue())
 
-    print(f"10 checks, {len(failed)} failing")
+    agent = (ROOT / "plugins/yudame/agents/researcher.md").read_text()
+    head = agent.split("---")[1]
+    check("researcher preloads the research skill", "\nskills: research\n" in head)
+    check("researcher can find ask.py", "*/skills/research/ask.py" in agent)
+
+    print(f"12 checks, {len(failed)} failing")
     return 1 if failed else 0
 
 
