@@ -81,9 +81,9 @@ The plugins have no `version`, so each commit on `main` is a new version. `claud
 
 ## Layout
 
-`plugins/<plugin>/skills/<name>/SKILL.md`, plus any files the skill reads. Adding a directory there adds the skill. `yudame` is self-contained. `do-design-audit` in `yudame-dev` falls back to the `house-style` skill, so developers should install both. `audit-hooks` and `cowork` are about Claude Code itself and say so in `compatibility`.
+`plugins/<plugin>/skills/<name>/SKILL.md`, plus any files the skill reads. Adding a directory there adds the skill. Subagents live in `plugins/<plugin>/agents/<name>.md` (Claude Code only); `researcher` is the one there today. `yudame` is self-contained. `do-design-audit` in `yudame-dev` falls back to the `house-style` skill, so developers should install both. `audit-hooks` and `cowork` are about Claude Code itself and say so in `compatibility`.
 
-`python3 tests/check_skills.py` checks that every skill loads in all three harnesses; `sh tests/check_install.sh` checks the installer; `python3 tests/check_tts.py` checks that the present skill's `tts.py` says the names in its lexicon as listed.
+`python3 tests/check_skills.py` checks that every skill loads in all three harnesses; `sh tests/check_install.sh` checks the installer; `python3 tests/check_tts.py` checks that the present skill's `tts.py` says the names in its lexicon as listed; `python3 tests/check_research.py` checks that the research skill's `run.py` calls Cuttlefish's research functions in order and renders the report, with no network or keys.
 
 ## Origin
 
