@@ -1,6 +1,6 @@
 ---
 name: present
-description: "Make a real presentation when one is asked for: a landscape deck, a one-page explainer, a spoken brief, or a narrated video, reading who it's for first. Not for a written answer, report or review, which goes as text; for a document too long for a chat it gives only the print recipe (A4/Letter PDF, no design pass). Use for 'present this', 'make a deck', or printing a needed document."
+description: "Make a real presentation when one is asked for: a landscape desktop deck (a portrait carousel when mobile is asked for), a one-page explainer, a spoken brief, or a narrated video, reading who it's for first. Not for a written answer, report or review, which goes as text; for a document too long for a chat it gives only the print recipe (A4/Letter PDF, no design pass). Use for 'present this', 'make a deck', or printing a needed document."
 argument-hint: "<topic, notes or file; defaults to the current conversation> [deck|page|brief|video]"
 ---
 
@@ -27,7 +27,7 @@ Use the form the user names. Choose one unasked only when the occasion is a pres
 
 | The occasion | Form |
 |---|---|
-| A room or a call, someone talking over slides; a proposal or decision session | **Deck**: a Slides artifact |
+| A room or a call, someone talking over slides; a proposal or decision session | **Deck**: a Slides artifact, landscape for a desktop screen; a portrait carousel only when someone asks for mobile-friendly, a phone or a carousel |
 | One reader at a screen who needs to get one idea fast | **Page**: a single-page artifact |
 | A busy listener who needs to decide or know something today, often away from a screen | **Brief**: a ~30-second audio file |
 | Something watched later or by many: a mechanism that unfolds over time, a walkthrough to send round | **Video**: a narrated MP4 |
@@ -58,10 +58,11 @@ Build the deck, page or document as one self-contained local HTML file. That fil
 
 - **Document** (a report or review too long for a chat): an ordinary document. `@page { size: A4; margin: 0 }` (`letter` for a US reader) with the margin as body padding (`20mm`, `box-decoration-break: clone`) so the background fills each page, one column, body 10.5 to 11pt, headings 14 to 18pt, ordinary tables with `break-inside: avoid` on short ones, images `max-width: 100%`. Headings, paragraphs and lists; no cover slide, no stat tiles.
 - **Page** (a one-page explainer): the same A4 or Letter portrait page, one page, the same type sizes, the visual shape from the Page form below.
-- **Deck:** landscape 16:9, PowerPoint's widescreen, one slide per page. `@page { size: 254mm 142.9mm; margin: 0 }`, each slide exactly that size with `break-after: page`. Body at least 18pt, headlines at least 28pt. Use the traditional layouts: title, title and content, two content, picture or diagram with caption, section header. A slide that won't fit at those sizes is over budget; split it. Vertical (`size: 108mm 192mm`, body at least 12pt, headlines at least 22pt) only when someone asks for it.
+- **Deck** (the default for any deck): PowerPoint's widescreen as PowerPoint makes it, 13.333 x 7.5 in, landscape, for a desktop screen or a projector, one slide per page. `@page { size: 338.7mm 190.5mm; margin: 0 }`, each slide exactly that size with `break-after: page`. Type in PowerPoint's normal range, with a ceiling: slide titles 32 to 40pt, body 16 to 24pt, captions, labels and table text 12 to 14pt; only a cover or statement slide's single line goes above 40pt, and never above 54pt. The same ranges hold for a `.pptx` deck. Use the space as a desktop deck does: a title over content (two columns, a diagram beside its points, a table, a chart with its takeaway), not one big phrase per slide. Use the traditional layouts: title, title and content, two content, picture or diagram with caption, section header.
+- **Mobile carousel** (only when someone asks for mobile-friendly, a phone, or a carousel): portrait 4:5 cards like a social media carousel, one idea per card, one card per page. `@page { size: 1080px 1350px; margin: 0 }`. Phones are large now, so the type is moderate, with a ceiling as for decks: headlines 56 to 72px, body 36 to 44px, captions 26 to 30px. For a feed that takes images, export each card as a 1080 x 1350 PNG (`pdftoppm -png -scale-to-x 1080 -scale-to-y 1350 out.pdf card`).
 - **Colour:** `print-color-adjust: exact` on `html`, or the background drops out.
 
-Before sending, check it: `pdfinfo out.pdf` for pages and size (595 x 842 pts for A4, 612 x 792 for Letter, 720 x 405 for a deck), and `pdftoppm -r 100 -png out.pdf p` gives each page at a readable screen size; look at them. Text cut off, a column squeezed, or a slide that is a wall of text is not done.
+Before sending, check it: `pdfinfo out.pdf` for pages and size (595 x 842 pts for A4, 612 x 792 for Letter, 960 x 540 for a deck, 810 x 1012.5 for a carousel), and `pdftoppm -r 100 -png out.pdf p` gives each page at a readable screen size; look at them. Text cut off, a column squeezed, or a slide that is a wall of text is not done.
 
 Other formats, only when asked:
 
@@ -84,7 +85,7 @@ Pick the deck's job first, because it decides the opening:
 - **Persuasion or decision** (proposals, client sessions, decision briefs): why, then how, then what. The first slides describe the audience's own situation and problem accurately before any solution appears; leading with the solution is how these decks fail. Each decision gets its own slide with a recommended default they can veto. The cover names who it is prepared for.
 - **Informational** (architecture, audit findings, status): a one-line scope and method note, then the subject. Don't manufacture a problem the audience never raised.
 
-Budgets: a statement slide holds at most 12 words, a concept slide about 40 words of body, a table 5 rows. Over budget means split the slide, never shrink the type. Diagrams show a relationship the text cannot, around seven nodes at most, every arrow labelled. Default length when unstated: 10 to 15 slides at about 30 seconds each.
+Budgets: a statement slide holds at most 12 words, a concept slide about 70 words of body, a table 8 rows. Over budget means split the slide, never shrink the type below its range; and never enlarge type past its range to fill a slide: fill it with content, or leave the space. A carousel card holds about 30 words, 5 to 10 cards. Diagrams show a relationship the text cannot, around seven nodes at most, every arrow labelled. Default length when unstated: 10 to 15 slides at about 30 seconds each.
 
 If the user wants the deck narrated, write speaker notes for the ear (below) and make it a video: one scene per slide.
 
