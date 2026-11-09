@@ -1,6 +1,6 @@
 ---
 name: email
-description: "Read, search, draft, or send the user's email, drafts first and de-slopped. Use for 'check my inbox', 'reply to that', or 'send an email'."
+description: "Read, search, draft, or send the user's email: drafted in full, edited against the email guide, then de-slopped. Use for 'check my inbox', 'reply to that', or 'send an email'."
 allowed-tools: Bash
 user-invocable: true
 ---
@@ -21,6 +21,15 @@ Use the first of these that is present and authenticated. A tool that is install
    ```
 3. **The Gmail connector** (`mcp__claude_ai_Gmail__*`: `search_threads`, `get_thread`, `create_draft`, `reply`), available in interactive sessions. On most desktop setups this is the working path.
 4. **Browser automation on the webmail UI**, only when nothing above can reach the mailbox at all. It is slow and fragile; for an ordinary read or send, go back up the list.
+
+## Drafting
+
+Tom's guide, [references/writing-emails-that-work.md](references/writing-emails-that-work.md), is for editing an email, not for writing one. Trying to write a short, rule-following email in one go from the raw context and goal works badly: "I would have written a shorter email, if I had more time." Take the time, in this order:
+
+1. **Write the full draft first.** Write it from the context and the goal, as long as it needs to be to say everything, without trying to follow the guide. The guide is never used to write the first draft.
+2. **Then edit it against the guide, at least once.** Read the guide, rewrite the whole draft against its six rules, then go through its checklist line by line, twice, as the guide asks of a draft written with AI. Do this yourself, with the sources at hand: the pass needs to know who agreed each promise and where each fact came from. Every email gets at least one pass, a one-line reply included.
+3. **More passes when the stakes are high.** An email to a client, about money or terms, answering a complaint, or anything hard to take back gets at least two passes, each one rewriting the last pass's result.
+4. **Then de-slop it,** as under Sending below.
 
 ## Sending
 
