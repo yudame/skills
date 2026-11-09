@@ -27,7 +27,7 @@ Use the first of these that is present and authenticated. A tool that is install
 Tom's guide, [references/writing-emails-that-work.md](references/writing-emails-that-work.md), is for editing an email, not for writing one. Trying to write a short, rule-following email in one go from the raw context and goal works badly: "I would have written a shorter email, if I had more time." Take the time, in this order:
 
 1. **Write the full draft first.** Write it from the context and the goal, as long as it needs to be to say everything, without trying to follow the guide. The guide is never used to write the first draft.
-2. **Then edit it against the guide, at least once.** Read the guide, rewrite the whole draft against its six rules, then go through its checklist line by line. Do this yourself, with the sources at hand: the pass needs to know who agreed each promise and where each fact came from. Every email gets at least one pass, a one-line reply included.
+2. **Then edit it against the guide, at least once.** Read the guide, rewrite the whole draft against its six rules, then go through its checklist line by line, twice, as the guide asks of a draft written with AI. Do this yourself, with the sources at hand: the pass needs to know who agreed each promise and where each fact came from. Every email gets at least one pass, a one-line reply included.
 3. **More passes when the stakes are high.** An email to a client, about money or terms, answering a complaint, or anything hard to take back gets at least two passes, each one rewriting the last pass's result.
 4. **Then de-slop it,** as under Sending below.
 
