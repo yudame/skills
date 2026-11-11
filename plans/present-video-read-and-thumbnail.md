@@ -19,11 +19,15 @@ commit with a test.
 
 ## What will be built
 
-1. **`tts.py`:** add two `LEXICON` entries, `"read-only": "ɹˈiːdˈoʊnli"` and
-   `"read only": "ɹˈiːd ˈoʊnli"`, on the existing splice path. Names stay
-   matchable inside a word (as in `valorengels`). The two read entries match
-   only as whole words, so `spread only` and `bread-only` stay untouched:
-   the regex gets `\b` on both sides of the read keys. Update the comment
+1. **`tts.py`:** add one `LEXICON` entry, `"read-only": "ɹˈiːdˈoʊnli"`, on
+   the existing splice path. The hyphenated form is always the adjective.
+   The spaced "read only" is spliced only after a form of be (is, are, was,
+   were, be, been, being, plus `'s`/`'re` contractions), because
+   "I read only the summary" is genuine past tense and must stay "red". In
+   `NAMES` this is one more alternative: `\b(?:is|are|was|were|be|been|being)\s+`
+   matched as plain text, then `read only` spliced as `ɹˈiːd ˈoʊnli`. Names
+   stay matchable inside a word (as in `valorengels`); the read alternatives
+   take `\b` on both sides, so `spread only` and `bread-only` stay untouched. Update the comment
    above `LEXICON` to say it holds words espeak says wrong, names and these
    phrases. Add no other rule: inspection shows the other "read" phrases are
    already right.
@@ -39,7 +43,9 @@ commit with a test.
 ## Tests
 
 - `tests/check_tts.py` new cases (stand-in phonemizer, no model):
-  `It is read-only.` and `The file is read only.` give the lexicon sound;
+  `It is read-only.`, `The file is read only.` and `They were read only`
+  give the lexicon sound; `I read only the summary.` and `She read only two
+  chapters.` give None (past tense left alone);
   `Read-Only mode` matches regardless of case; `spread only` and
   `bread-only` give None; `I read it yesterday.`, `read access` and
   `read-write` give None (left to the engine); a sentence that has both
@@ -50,11 +56,15 @@ commit with a test.
     `uv`, as SKILL.md says. Whisper's language model may spell "red" as
     "read", so the main evidence is the phoneme string Kokoro receives
     (`ɹˈiːd`), which it speaks as given.
+  - Re-run the phonemizer probe on whole sentences (read access, read it,
+    to read, read-write, past-tense read) and put its output in the
+    delivery as evidence that the engine already gets those right.
   - Thumbnail: copy `video/` to `$TMPDIR` with the sample `scenes.json`, run
     TTS and `npm install`, then `npx remotion still Explainer --frame=0`
-    and `npx remotion render`. Frame 0 of the MP4 must not be blank: ffmpeg
-    `signalstats` shows ink pixels, and I look at the frame myself, which
-    shows the first title. Frame 0 of the second scene, captured as a still,
+    and `npx remotion render`. The evidence comes from the encoded MP4, whose
+    first frame is the thumbnail: frame 0 pulled with ffmpeg shows ink pixels
+    under `signalstats`, and I look at the frame myself, which shows the
+    first title. Both results go in the delivery. Frame 0 of the second scene, captured as a still,
     is still blank, which shows only the first scene changed.
 - Suite: `python3 tests/check_skills.py`, `tests/check_tts.py`,
   `tests/check_present.py`, `sh tests/check_install.sh`; all pass.
