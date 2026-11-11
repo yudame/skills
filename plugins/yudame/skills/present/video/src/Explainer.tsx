@@ -23,7 +23,8 @@ export type ExplainerProps = {scenes: Scene[]};
 const SceneView = ({scene, index}: {scene: Scene; index: number}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
-  const enter = spring({frame, fps, config: {damping: 200}});
+  // The first scene is drawn fully at frame 0, so the file's thumbnail is the title, not a blank page.
+  const enter = index === 0 ? 1 : spring({frame, fps, config: {damping: 200}});
   const narration = Math.ceil(scene.seconds * FPS);
   return (
     <AbsoluteFill style={{background: CREAM, color: INK, padding: '220px 90px', fontFamily: sans}}>
