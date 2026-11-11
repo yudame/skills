@@ -116,7 +116,7 @@ Writing for the ear, for every voiced form:
 
 - Contractions throughout; written prose sounds stiff aloud.
 - No issue, PR, port or other multi-digit numbers. TTS reads "1195" as "one thousand one hundred ninety-five", which spends the listener's attention on nothing. Name the work by substance ("the continuation crash").
-- Write names as they are spelled. `LEXICON` in `tts.py` gives Kokoro the sound for names it says wrong (Engels, Yudame, yuda.me); when another name comes out wrong, add it there, tuned by transcribing the clip back. Never IPA in slashes in the text: the phonemizer reads `/.../` literally, garbling the word and doubling the clip length.
+- Write names as they are spelled. `LEXICON` in `tts.py` gives Kokoro the sound for words it says wrong: names (Engels, Yudame, yuda.me) and present-tense "read" phrases it says "red" (read-only, read-write, read access); when another word comes out wrong, add it there, tuned by transcribing the clip back. Never IPA in slashes in the text: the phonemizer reads `/.../` literally, garbling the word and doubling the clip length.
 - Short sentences with one idea each; a listener can't re-read.
 
 Synthesize with `tts.py` in this skill's directory, run through `uv` (it declares its own dependencies):

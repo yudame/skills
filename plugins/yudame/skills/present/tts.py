@@ -30,16 +30,31 @@ MODEL_URL = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model
 DEFAULT_KOKORO_VOICE = "am_michael"
 DEFAULT_SAY_VOICE = "Daniel"
 
-# Names espeak says wrong, as Kokoro phonemes. The text, captions and manifest
+# Words espeak says wrong, as Kokoro phonemes. The text, captions and manifest
 # keep the real spelling; only the sound changes. Engels as in Friedrich Engels
 # (ENG-gulz), Yudame as in Spanish "ayudame" without the a, stressed first (YOO-dah-meh).
+# The read phrases are always present tense ("reed"), but espeak says "red" after
+# is, was or get; past tense elsewhere is left to the engine.
 LEXICON = {
     "engels": "ˈɛŋɡəlz",
     "yudame": "jˈuːdɑmeɪ",
     "yuda.me": "jˈuːdɑmeɪ",
+    "read-only": "ɹˈiːdˈoʊnli",
+    "read only": "ɹˈiːd ˈoʊnli",
+    "read-write": "ɹˈiːdɹˈaɪt",
+    "read-heavy": "ɹˈiːdhˈɛvi",
+    "read access": "ɹˈiːd ˈæksɛs",
+    "read permission": "ɹˈiːd pɚmˈɪʃən",
+    "read permissions": "ɹˈiːd pɚmˈɪʃənz",
 }
+READ = {k for k in LEXICON if k.startswith("read")}  # whole words; names may sit inside a word, as in valorengels
 NAMES = re.compile(
-    r"(?P<name>" + "|".join(re.escape(k) for k in sorted(LEXICON, key=len, reverse=True)) + r")(?P<pos>['’]s)?"
+    r"\b(?P<read>"
+    + "|".join(re.escape(k).replace(r"\ ", r"\s+") for k in sorted(READ - {"read only"}, key=len, reverse=True))
+    + r")\b"
+    # spaced "read only" only after a form of be: "I read only the summary" is past tense
+    r"|(?P<be>\b(?:is|are|was|were|be|been|being)\s+|(?<=\w)['’](?:s|re)\s+)(?P<readonly>read\s+only)\b"
+    r"|(?P<name>" + "|".join(re.escape(k) for k in sorted(set(LEXICON) - READ, key=len, reverse=True)) + r")(?P<pos>['’]s)?"
     r"|(?<=\w)\.(?=\w)",  # a dot inside a domain, said "dot"
     re.IGNORECASE,
 )
@@ -72,8 +87,8 @@ def to_format(wav: Path, out: Path) -> None:
 
 
 def splice(text: str, phonemize) -> str | None:
-    """Phonemes for `text` with each LEXICON name said as listed, or None when
-    no name occurs. `phonemize` strips its input, as kokoro's does, so the
+    """Phonemes for `text` with each LEXICON word said as listed, or None when
+    no word occurs. `phonemize` strips its input, as kokoro's does, so the
     spaces around each piece are put back here."""
     out, plain, found = [], [], False
 
@@ -91,12 +106,15 @@ def splice(text: str, phonemize) -> str | None:
     for m in NAMES.finditer(text):
         plain.append(text[at : m.start()])
         at = m.end()
-        if not m.group("name"):
+        if m.group("be"):
+            plain.append(m.group("be"))
+        word = m.group("name") or m.group("read") or m.group("readonly")
+        if not word:
             plain.append(" dot ")
             continue
         found = True
         flush()
-        sound = LEXICON[m.group("name").lower()]
+        sound = LEXICON[" ".join(word.lower().split())]
         if m.group("pos"):
             sound += "ᵻz" if sound.endswith(("s", "z")) else "z"
         if out and out[-1] and not out[-1].endswith(" "):
